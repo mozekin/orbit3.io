@@ -1,0 +1,46 @@
+[debug] [2018-07-26T04:01:00.160Z] ----------------------------------------------------------------------
+[debug] [2018-07-26T04:01:00.162Z] Command:       /home/mozekin/.nvm/versions/node/v10.7.0/bin/node /home/mozekin/.nvm/versions/node/v10.7.0/bin/firebase deploy --project orbit3-1
+[debug] [2018-07-26T04:01:00.162Z] CLI Version:   4.0.0
+[debug] [2018-07-26T04:01:00.162Z] Platform:      linux
+[debug] [2018-07-26T04:01:00.162Z] Node Version:  v10.7.0
+[debug] [2018-07-26T04:01:00.164Z] Time:          Thu Jul 26 2018 14:01:00 GMT+1000 (Australian Eastern Standard Time)
+[debug] [2018-07-26T04:01:00.164Z] ----------------------------------------------------------------------
+[debug] 
+[debug] [2018-07-26T04:01:00.171Z] > command requires scopes: ["email","openid","https://www.googleapis.com/auth/cloudplatformprojects.readonly","https://www.googleapis.com/auth/firebase","https://www.googleapis.com/auth/cloud-platform"]
+[debug] [2018-07-26T04:01:00.171Z] > authorizing via signed-in user
+[debug] [2018-07-26T04:01:00.173Z] > refreshing access token with scopes: ["email","https://www.googleapis.com/auth/cloud-platform","https://www.googleapis.com/auth/cloudplatformprojects.readonly","https://www.googleapis.com/auth/firebase","openid"]
+[debug] [2018-07-26T04:01:00.173Z] >>> HTTP REQUEST POST https://www.googleapis.com/oauth2/v3/token  
+ { refresh_token:
+   '1/Y_gwEJ-Z2oBS9ujC2lNGniaNzKC0PNGud47OLSfKwhSGxxRy8tpFlB5VDxBQP6Yc',
+  client_id:
+   '563584335869-fgrhgmd47bqnekij5i8b5pr03ho849e6.apps.googleusercontent.com',
+  client_secret: 'j9iVZfS8kkCEFUPaAeJV0sAi',
+  grant_type: 'refresh_token',
+  scope:
+   'email https://www.googleapis.com/auth/cloud-platform https://www.googleapis.com/auth/cloudplatformprojects.readonly https://www.googleapis.com/auth/firebase openid' } 
+ Thu Jul 26 2018 14:01:00 GMT+1000 (Australian Eastern Standard Time)
+[debug] [2018-07-26T04:01:00.547Z] <<< HTTP RESPONSE 200
+[debug] [2018-07-26T04:01:00.557Z] >>> HTTP REQUEST GET https://admin.firebase.com/v1/projects/orbit3-1  
+  
+ Thu Jul 26 2018 14:01:00 GMT+1000 (Australian Eastern Standard Time)
+[debug] [2018-07-26T04:01:01.833Z] <<< HTTP RESPONSE 200
+[debug] [2018-07-26T04:01:01.835Z] >>> HTTP REQUEST GET https://admin.firebase.com/v1/database/orbit3-1/tokens  
+  
+ Thu Jul 26 2018 14:01:01 GMT+1000 (Australian Eastern Standard Time)
+[debug] [2018-07-26T04:01:02.877Z] <<< HTTP RESPONSE 200
+[info] 
+[info] === Deploying to 'orbit3-1'...
+[info] 
+[info] i  deploying functions, hosting
+[debug] [2018-07-26T04:01:03.970Z] TypeError [ERR_INVALID_ARG_TYPE]: The "path" argument must be of type string. Received type undefined
+    at assertPath (path.js:39:11)
+    at Object.join (path.js:1157:7)
+    at Config.path (/home/mozekin/.nvm/versions/node/v10.7.0/lib/node_modules/firebase-tools/lib/config.js:166:37)
+    at /home/mozekin/.nvm/versions/node/v10.7.0/lib/node_modules/firebase-tools/lib/deploy/lifecycleHooks.js:68:38
+    at _chain (/home/mozekin/.nvm/versions/node/v10.7.0/lib/node_modules/firebase-tools/lib/deploy/index.js:26:38)
+    at deploy (/home/mozekin/.nvm/versions/node/v10.7.0/lib/node_modules/firebase-tools/lib/deploy/index.js:81:10)
+    at Command._action (/home/mozekin/.nvm/versions/node/v10.7.0/lib/node_modules/firebase-tools/commands/deploy.js:53:12)
+    at /home/mozekin/.nvm/versions/node/v10.7.0/lib/node_modules/firebase-tools/lib/command.js:200:29
+    at process._tickCallback (internal/process/next_tick.js:68:7)
+[error] 
+[error] Error: An unexpected error has occurred.
