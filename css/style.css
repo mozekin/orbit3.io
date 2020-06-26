@@ -6190,7 +6190,7 @@ header .col.lg-2{ width:450px !important; flex: inherit;}
   .decoration-rightside-2.img-hero2 {
     position: relative;
     left: auto;
-    bottom: auto;
+    bottom: auto; display:none;
     width: 100%;
     height: auto;
   }
