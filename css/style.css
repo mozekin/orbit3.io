@@ -5561,8 +5561,8 @@ header .col.lg-2{ width:450px !important; flex: inherit;}
   }
   .section.is-hero.hero-hosting {
     background-image: url('../images/hero2.svg'), linear-gradient(142deg, #b6dff7, #80c1ec);
-    background-position: 50% -30%, 0px 0px;
-    background-size: 470px, auto;
+/*     background-position: 50% -30%, 0px 0px;
+    background-size: 470px, auto; */
     background-repeat: no-repeat, repeat;
   }
   .section.is-hero.hero-hosting.overflow-hidden.position-relative.zindex99 {
