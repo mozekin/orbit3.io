@@ -5590,7 +5590,7 @@ header .col.lg-2{ width:450px !important; flex: inherit;}
     -webkit-flex-direction: column;
     -ms-flex-direction: column;
     flex-direction: column;
-  }
+  } 
   .nav-menu {
     background-color: #1d2b36;
     text-align: left;
