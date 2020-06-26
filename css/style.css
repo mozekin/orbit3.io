@@ -5565,6 +5565,7 @@ header .col.lg-2{ width:450px !important; flex: inherit;}
     background-size: 60%;
     background-position: right 72px;
   }
+  .is-hero h1{    font-size: 30px;}
   .decoration-rightside-2.img-hero2 { display: none;}
   .section.is-hero.hero-hosting.overflow-hidden.position-relative.zindex99 {
     z-index: 99;
