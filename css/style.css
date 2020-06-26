@@ -5558,14 +5558,16 @@ header .col.lg-2{ width:450px !important; flex: inherit;}
     padding-bottom: 0px;
   }
   .section.is-hero.hero-hosting {
-    background-image: url('../images/hero2.svg'), linear-gradient(142deg, #b6dff7, #80c1ec);
-/*     background-position: 50% -30%, 0px 0px;
+  /*    background-image: url('../images/hero2.svg'), linear-gradient(142deg, #b6dff7, #80c1ec);
+   background-position: 50% -30%, 0px 0px;
     background-size: 470px, auto; */
     background-repeat: no-repeat, repeat;
     background-size: 60%;
-    background-position: right 72px;
+    background-position: right 85px;
+    background-image: url(../images/hero2.svg);
+    background-color: #b6dff7;
   }
-  .is-hero h1{    font-size: 30px;}
+  .is-hero h1{    font-size: 32px;}
   .decoration-rightside-2.img-hero2 { display: none;}
   .section.is-hero.hero-hosting.overflow-hidden.position-relative.zindex99 {
     z-index: 99;
