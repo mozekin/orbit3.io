@@ -5564,11 +5564,8 @@ header .col.lg-2{ width:450px !important; flex: inherit;}
 /*     background-position: 50% -30%, 0px 0px;
     background-size: 470px, auto; */
     background-repeat: no-repeat, repeat;
-    
-        background-size: 60%;
+    background-size: 60%;
     background-position: right 72px;
-    
-    
   }
   .decoration-rightside-2.img-hero2 { display: none;}
   .section.is-hero.hero-hosting.overflow-hidden.position-relative.zindex99 {
