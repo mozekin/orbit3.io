@@ -7948,3 +7948,13 @@ header .col.lg-2{ width:450px !important; flex: inherit;}
     font-weight: 400;
     vertical-align: top;}
 .top-btn > div { color: #fff; text-align: center; letter-spacing: 0.1em; font-size: 12px;font-weight: 700; margin: 3px 0 0 0;  text-transform: uppercase;}
+
+/* Nav CTA button (added in overhaul) */
+.nav-cta-button { display: inline-flex; align-items: center; margin-left: 18px; padding: 10px 22px; vertical-align: middle; }
+.nav-cta-button .button-primary-text { margin: 0; }
+@media screen and (max-width: 991px) {
+  .nav-cta-button { margin: 12px 0 0 0; }
+}
+/* Secondary CTA link on dark backgrounds */
+.c-link.on-dark { color: #fff; }
+.cta-secondary-note { font-size: 14px; }
