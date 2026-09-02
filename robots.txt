@@ -1,6 +1,5 @@
 User-agent: *
 Allow: /
-Disallow: /about-us.html
-Disallow: /Blog/
+Disallow: /404.html
 
 Sitemap: https://orbit3.io/sitemap.xml
