@@ -2,13 +2,14 @@
 """Generator for the orbit3.io pages. Run from the repo root:  python3 tools/build.py
 All page copy, titles, descriptions and schema live in this file; it writes the HTML files in place.
 The site has no build step, so the generated HTML is what gets committed and served."""
-import json, os, re, html
+import json, os, re, html, hashlib
 
 SITE = "https://orbit3.io"
 CAL = "https://calendly.com/martin-orbit3/introductory-call"
 LINKEDIN = "https://linkedin.com/company/orbit3"
 GA = "G-YT6G7B299N"
 TODAY = "2026-09-02"
+CSS_VER = hashlib.sha1(open("css/orbit3.css", "rb").read()).hexdigest()[:8]
 
 # ---------------------------------------------------------------- icons
 I = {
@@ -205,7 +206,7 @@ def head(path, title, desc, ld_graph, robots="index, follow, max-image-preview:l
 <link rel="apple-touch-icon" href="/images/apple-touch-icon.png" sizes="180x180">
 <link rel="preload" href="/fonts/dm-sans-variable.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="preload" href="/fonts/space-grotesk-variable.woff2" as="font" type="font/woff2" crossorigin>
-<link href="/css/orbit3.css" rel="stylesheet">
+<link href="/css/orbit3.css?v={CSS_VER}" rel="stylesheet">
 <script>document.documentElement.classList.add('js');</script>
 <script type="application/ld+json">{ld}</script>
 <!-- Google tag (gtag.js) with Consent Mode v2: analytics cookies stay off until the visitor accepts -->
@@ -1453,7 +1454,7 @@ def post_page(post):
     <span class="eyebrow eyebrow--center">{post["category"]}</span>
     <h1 class="measure" style="font-size:clamp(2rem,4.4vw,3.3rem)">{post["title"]}</h1>
     <p class="lede measure">{post["summary"]}</p>
-    <div class="post-meta"><span>By <a href="/about/">Martin, Founder</a></span><span>Published <time datetime="{post["date"]}">{nice_date}</time></span><span>{mins} min read</span></div>
+    <div class="post-meta"><span>By <a href="/about/">Martin, Founder</a></span><span class="sep" aria-hidden="true">·</span><span>Published <time datetime="{post["date"]}">{nice_date}</time></span><span class="sep" aria-hidden="true">·</span><span>{mins} min read</span></div>
   </div>
 </section>
 <article class="section" style="padding-top:16px">
@@ -1490,7 +1491,7 @@ def insights_index():
     for p in sorted(POSTS, key=lambda x: x["date"], reverse=True):
         words, mins = reading_time(p["body"])
         nice_date = __import__("datetime").date.fromisoformat(p["date"]).strftime("%-d %B %Y")
-        cards += f'<a class="card card--link reveal" href="/insights/{p["slug"]}/"><div class="post-kicker"><span class="cat">{p["category"]}</span><span>{nice_date}</span><span>{mins} min read</span></div><h2 style="font-size:clamp(1.3rem,2.2vw,1.7rem)">{p["title"]}</h2><p>{p["summary"]}</p><span class="link-arrow">Read the guide {I["arrow"]}</span></a>'
+        cards += f'<a class="card card--link reveal" href="/insights/{p["slug"]}/"><div class="post-kicker"><span class="cat">{p["category"]}</span><span class="sep" aria-hidden="true">·</span><span>{nice_date}</span><span class="sep" aria-hidden="true">·</span><span>{mins} min read</span></div><h2 style="font-size:clamp(1.3rem,2.2vw,1.7rem)">{p["title"]}</h2><p>{p["summary"]}</p><span class="link-arrow">Read the guide {I["arrow"]}</span></a>'
     body = f'''<section class="page-hero center">
   <div class="aurora" aria-hidden="true"><span class="blob"></span></div>
   <div class="hero-grid-overlay" aria-hidden="true"></div>
