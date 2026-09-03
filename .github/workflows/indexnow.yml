@@ -1,0 +1,37 @@
+# Submits every URL in sitemap.xml to IndexNow (Bing, Yandex, Naver, Seznam) after each
+# deploy to master. Waits for GitHub Pages to publish the IndexNow key file first, because
+# search engines verify the key against the live site before accepting the submission.
+name: IndexNow submission
+
+on:
+  push:
+    branches: [master]
+    paths:
+      - "**.html"
+      - "sitemap.xml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  submit:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Wait for GitHub Pages to serve the current sitemap and key file
+        run: |
+          KEY=$(python3 -c "import re;print(re.search(r'KEY = \"([0-9a-f]+)\"', open('tools/indexnow.py').read()).group(1))")
+          for i in $(seq 1 40); do
+            live=$(curl -sS -m 20 "https://orbit3.io/$KEY.txt" || true)
+            site=$(curl -sS -m 20 "https://orbit3.io/sitemap.xml" || true)
+            if [ "$live" = "$KEY" ] && [ "$site" = "$(cat sitemap.xml)" ]; then
+              echo "Pages deploy is live after $((i*15))s"; exit 0
+            fi
+            sleep 15
+          done
+          echo "Pages deploy not detected within 10 minutes; submitting anyway"
+
+      - name: Submit sitemap URLs to IndexNow
+        run: python3 tools/indexnow.py
