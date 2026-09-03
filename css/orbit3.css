@@ -419,3 +419,33 @@ a:focus-visible, button:focus-visible, summary:focus-visible, .nav-burger:focus-
   .checklist--grid { grid-template-columns: 1fr; }
   .logos--grid { grid-template-columns: repeat(2, 1fr); }
 }
+
+/* ---------- Insights / long-form posts ---------- */
+.post { max-width: 780px; margin: 0 auto; }
+.post-meta { display: flex; flex-wrap: wrap; justify-content: center; gap: 8px 18px; margin-top: 20px; font-size: 0.9rem; color: var(--fg-faint); }
+.post-meta a { color: var(--fg-muted); }
+.post-meta a:hover { color: var(--accent); }
+.toc { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 20px 24px; margin: 0 0 44px; }
+.toc-title { font-family: var(--font-head); font-size: 0.76rem; letter-spacing: 0.14em; text-transform: uppercase; color: var(--fg-faint); margin-bottom: 10px; }
+.toc ol { margin: 0; padding-left: 20px; display: grid; gap: 6px; color: var(--fg-muted); font-size: 0.97rem; }
+.toc a:hover { color: var(--accent); }
+.prose h2 { font-size: clamp(1.5rem, 2.6vw, 2rem); margin-top: 2.2em; scroll-margin-top: 96px; }
+.prose h3 { font-size: 1.22rem; margin-top: 1.8em; }
+.prose p, .prose li { color: var(--fg-muted); font-size: 1.05rem; line-height: 1.75; }
+.prose ul, .prose ol { padding-left: 24px; margin: 0 0 1.2rem; display: grid; gap: 8px; }
+.prose li::marker { color: var(--accent); }
+.prose a { color: var(--accent); text-decoration: underline; text-underline-offset: 3px; text-decoration-color: rgba(45,212,191,0.4); }
+.prose a:hover { text-decoration-color: var(--accent); }
+.prose strong { color: var(--fg); }
+.prose .callout { border-left: 3px solid var(--accent); background: var(--surface); padding: 16px 20px; border-radius: 0 12px 12px 0; margin: 1.6rem 0; }
+.prose .callout p:last-child { margin-bottom: 0; }
+.table-wrap { overflow-x: auto; margin: 1.2rem 0 1.6rem; border: 1px solid var(--border); border-radius: 12px; }
+.prose table { width: 100%; border-collapse: collapse; font-size: 0.95rem; min-width: 560px; }
+.prose th, .prose td { text-align: left; padding: 11px 14px; border-top: 1px solid var(--border); vertical-align: top; color: var(--fg-muted); }
+.prose thead th { border-top: 0; background: var(--surface); color: var(--fg); font-family: var(--font-head); font-weight: 600; font-size: 0.8rem; letter-spacing: 0.06em; text-transform: uppercase; }
+.author-card { display: flex; gap: 18px; align-items: flex-start; }
+.author-card .card-icon { flex: none; }
+.author-card p:last-child { margin-bottom: 0; }
+.post-list { display: grid; gap: 20px; }
+.post-kicker { display: flex; flex-wrap: wrap; gap: 6px 14px; font-family: var(--font-head); font-size: 0.76rem; letter-spacing: 0.12em; text-transform: uppercase; color: var(--fg-faint); margin-bottom: 12px; }
+.post-kicker .cat { color: var(--accent); }

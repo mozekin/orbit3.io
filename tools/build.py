@@ -2,7 +2,7 @@
 """Generator for the orbit3.io pages. Run from the repo root:  python3 tools/build.py
 All page copy, titles, descriptions and schema live in this file; it writes the HTML files in place.
 The site has no build step, so the generated HTML is what gets committed and served."""
-import json, os, html
+import json, os, re, html
 
 SITE = "https://orbit3.io"
 CAL = "https://calendly.com/martin-orbit3/introductory-call"
@@ -37,6 +37,7 @@ SERVICES = [
  ("ai-solutions", "AI Solutions"),
  ("cloud-adoption", "Cloud Adoption"),
  ("cloud-security", "Cloud Security"),
+ ("soc2-compliance", "SOC 2 Compliance"),
  ("cloud-optimisation", "Cloud Optimisation"),
  ("cloud-devops", "Cloud DevOps"),
  ("cloud-backup", "Cloud Backup"),
@@ -52,7 +53,7 @@ ORG = {
  "email": "hello@orbit3.io",
  "sameAs": [LINKEDIN],
  "founder": {"@type": "Person", "name": "Martin", "jobTitle": "Founder", "url": f"{SITE}/about/"},
- "knowsAbout": ["Managed cloud services", "CloudOps", "FinOps", "Cloud security", "DevOps", "Cloud migration", "Backup and disaster recovery", "AI consulting", "LLM implementation", "Workflow automation", "Amazon Web Services", "Microsoft Azure", "Google Cloud"],
+ "knowsAbout": ["Managed cloud services", "CloudOps", "FinOps", "Cloud security", "SOC 2 compliance", "SOC 2 remediation", "Vanta", "DevOps", "Cloud migration", "Backup and disaster recovery", "AI consulting", "LLM implementation", "Workflow automation", "Amazon Web Services", "Microsoft Azure", "Google Cloud"],
  "contactPoint": {"@type": "ContactPoint", "contactType": "sales", "email": "hello@orbit3.io", "url": CAL, "availableLanguage": "English"},
 }
 
@@ -69,6 +70,7 @@ def nav_links(current):
         <a href="/Services/"{svc_cur}>Services</a>
         <div class="dropdown-menu">{dd}</div>
       </div>
+      {a("/insights/", "Insights")}
       {a("/about/", "About")}
       {a("/contact/", "Contact")}
     </nav>'''
@@ -93,6 +95,7 @@ def header(current):
   <div class="mm-label">Services</div>
   {dd}
   <div class="mm-label">&nbsp;</div>
+  <a href="/insights/">Insights</a>
   <a href="/about/">About</a>
   <a href="/contact/">Contact</a>
   <a class="btn btn-primary" href="{CAL}" target="_blank" rel="noopener noreferrer">{I["cal"]} Book a call</a>
@@ -117,6 +120,7 @@ def footer():
         <div class="footer-col-title">Company</div>
         <a href="/">Home</a>
         <a href="/Services/">All services</a>
+        <a href="/insights/">Insights</a>
         <a href="/about/">About Orbit3</a>
         <a href="/contact/">Contact</a>
       </div>
@@ -284,6 +288,7 @@ BLURB = {
  "ai-solutions": "Custom LLM applications, RAG, workflow automation and AI agents, built on secure foundations and run as a managed service.",
  "cloud-adoption": "Assessment, architecture and migration for teams moving workloads to the cloud for the first time, or the second.",
  "cloud-security": "Security reviews, risk assessments and hardened target-state controls mapped to the standards you need to meet.",
+ "soc2-compliance": "SOC 2 readiness and remediation in Vanta: we fix the failing tests, implement the controls and keep them green through the audit.",
  "cloud-optimisation": "FinOps analysis, right-sizing and governance that cut cloud spend and keep it down.",
  "cloud-devops": "CI/CD pipelines, infrastructure as code and observability so your team ships daily with confidence.",
  "cloud-backup": "Backup and disaster recovery designed around your recovery objectives, and tested so restores are routine.",
@@ -367,6 +372,7 @@ def included_h2(slug):
      "ai-solutions": "From scoping to a system your team relies on",
      "cloud-adoption": "A migration you can plan around",
      "cloud-security": "Controls you can show an auditor",
+     "soc2-compliance": "Every failing test owned, fixed and evidenced",
      "cloud-optimisation": "Savings that survive next quarter",
      "cloud-devops": "The delivery platform your engineers wish they had",
      "cloud-backup": "Protection that has actually been restored from",
@@ -377,6 +383,7 @@ INCLUDED_INTRO = {
  "ai-solutions": "AI work fails when it stops at the demo. We take a use case from a scoping conversation through a working build to a monitored production system, and we stay responsible for it.",
  "cloud-adoption": "Every migration we run is built around a written assessment, a target architecture you can question, and a cut-over plan with a way back.",
  "cloud-security": "Security work is only useful if it leaves you with controls that hold, evidence you can produce, and a team that knows what changed. This is what each engagement covers.",
+ "soc2-compliance": "Vanta tells you what is failing. Someone still has to fix it, prove it, and keep it fixed through the observation window. That is the part we take ownership of.",
  "cloud-optimisation": "A one-off cost review saves money once. We combine the analysis with the governance and automation that stop waste creeping back.",
  "cloud-devops": "We build the pipeline, the infrastructure code and the observability together, because each one is weaker without the others.",
  "cloud-backup": "Backup is a process, not a product. We design it around what your business can afford to lose and how long it can afford to be down, then prove it works.",
@@ -386,6 +393,7 @@ HOW_INTRO = {
  "ai-solutions": "A clear, low-risk path from idea to value that compounds, rather than a one-off project that decays after launch.",
  "cloud-adoption": "Three phases, each with a deliverable you can review before we move to the next. No big-bang cut-overs.",
  "cloud-security": "We work from evidence, not assumptions: what is actually configured today, what the risk is, and what good looks like for your size and sector.",
+ "soc2-compliance": "SOC 2 projects stall in remediation, not in the audit. We run remediation as an engineering project with an owner, a ranked backlog and a date.",
  "cloud-optimisation": "We start with the bill, not a tool. The first pass usually finds the obvious waste; the discipline afterwards is what keeps the number down.",
  "cloud-devops": "We meet your team where it is. Some clients want us to build the platform and hand it over; others want us to run it. Both start the same way.",
  "cloud-backup": "A backup you have never restored from is a hope, not a plan. Every engagement ends with a rehearsed recovery and a written runbook.",
@@ -395,6 +403,7 @@ PLATFORM_INTRO = {
  "ai-solutions": "We build on the model and hosting options your data and compliance posture allow, from managed model APIs to private deployments inside your own cloud account.",
  "cloud-adoption": "We are not tied to one vendor. The target platform is a decision we make with you, based on your workloads, your team's skills and your commercial position.",
  "cloud-security": "Each platform has its own native security services and its own sharp edges. We work with the native tooling first and add third-party controls only where they earn their place.",
+ "soc2-compliance": "Most of Vanta's infrastructure tests map to native platform services. Configured correctly and in code, they stay green without anyone touching them.",
  "cloud-optimisation": "Pricing models, commitment discounts and cost tooling differ by cloud. We know where the savings hide on each one.",
  "cloud-devops": "The principles are the same everywhere; the services differ. We work with the native pipelines and the platform-neutral tools your team already knows.",
  "cloud-backup": "Each cloud has native backup services that are excellent for some workloads and inadequate for others. We use them where they fit and add cross-region or cross-cloud protection where they don't.",
@@ -404,6 +413,7 @@ RELATED_INTRO = {
  "ai-solutions": "AI systems are only as reliable as the platform under them. These are the services that make an AI build safe to depend on.",
  "cloud-adoption": "A migration is the moment to get the fundamentals right. These are the services most clients bundle with it.",
  "cloud-security": "Security is easier to maintain when someone is watching the environment every day. These services keep the posture from drifting.",
+ "soc2-compliance": "SOC 2 controls are mostly good operations written down. These are the services that make the controls true rather than just documented.",
  "cloud-optimisation": "Cost, performance and reliability pull on each other. These services keep the balance once the savings are in.",
  "cloud-devops": "A good delivery platform needs a well-run environment underneath it. These services are the usual next step.",
  "cloud-backup": "Recovery planning sits alongside security and day-to-day operations. These services close the loop.",
@@ -491,7 +501,7 @@ service_page(
   ("Incident response", "Triage, remediation and a written post-incident review for anything that affected service, within the response targets in your agreement."),
   ("Patch and lifecycle management", "Operating systems, managed services, runtimes and dependencies kept current on a schedule you approve."),
   ("Identity and access management", "Least-privilege roles, joiner and leaver processes, MFA enforcement and periodic access reviews."),
-  ("Security posture management", "Native security tooling configured and reviewed, findings triaged and fixed, evidence retained."),
+  ("Security posture management", "Native security tooling configured and reviewed, findings triaged and fixed, evidence retained for <a href=\"/Services/soc2-compliance/\">SOC 2</a> and ISO 27001 audits."),
   ("Backup and recovery operations", "Backup jobs monitored, restores tested on a schedule, recovery runbooks maintained."),
   ("Cost management (FinOps)", "Monthly cost review, anomaly detection, right-sizing and commitment recommendations you can act on."),
   ("Infrastructure as code", "Changes made through version-controlled Terraform or native templates, so every change is reviewable and repeatable."),
@@ -669,7 +679,7 @@ service_page(
   ("Configuration and posture review", "Every account, role, network path and storage location, against a recognised benchmark."),
   ("Risk assessment", "Findings ranked by what an attacker could actually do with them, not by tool severity."),
   ("Target-state controls", "Identity, network, data protection, logging and detection designed and implemented."),
-  ("Compliance mapping", "Controls mapped to ISO 27001, SOC 2, Cyber Essentials or the framework your customers ask about."),
+  ("Compliance mapping", "Controls mapped to ISO 27001, SOC 2, Cyber Essentials or the framework your customers ask about. Working towards SOC 2 in Vanta? See our <a href=\"/Services/soc2-compliance/\">SOC 2 remediation service</a>."),
  ],
  panel=glance([("Starts with", "Posture review"), ("Output", "Ranked findings + remediation plan"), ("Frameworks", "CIS · ISO 27001 · SOC 2 · Cyber Essentials"), ("Afterwards", "Controls maintained under managed services")]),
  who={"h2": "For businesses that have to answer a security questionnaire, or should",
@@ -709,7 +719,7 @@ service_page(
   ("Do you fix the problems or just report them?", "Both. The report is written so your team could act on it alone, and we are equally happy to implement the fixes ourselves. Most clients ask us to handle the high-risk items immediately and work through the rest together."),
   ("What keeps the environment secure afterwards?", "Controls drift as people and systems change. Our managed service maintains and evidences them every month; otherwise we recommend a re-assessment at least annually or after any major change."),
  ],
- rel=["cloudops-managed-services", "cloud-backup", "cloud-devops"],
+ rel=["soc2-compliance", "cloudops-managed-services", "cloud-backup"],
  cta={"eyebrow": "Get started", "h2": "Worried about your security posture?", "p": "Book a free 30-minute call and we'll help you find the gaps that matter most, and how to close them."},
  service_type="Cloud security assessment",
 )
@@ -900,6 +910,90 @@ service_page(
  service_type="Cloud backup and disaster recovery",
 )
 
+
+# ---------- SOC 2 Compliance & Remediation
+service_page(
+ slug="soc2-compliance",
+ title="SOC 2 Remediation & Compliance Services (Vanta) | Orbit3",
+ desc="SOC 2 remediation from Orbit3: we fix the failing tests in Vanta, implement the technical and organisational controls, and keep them green through the audit.",
+ h1="SOC 2 compliance <span class=\"text-gradient\">without the scramble</span>",
+ lede="Vanta shows you the gaps. We close them: cloud controls, policies, evidence and the operational discipline to stay audit-ready through the observation window and beyond.",
+ eyebrow="SOC 2 remediation services",
+ h2="SOC 2 readiness and remediation, delivered in Vanta",
+ intro_paras=[
+  "Most companies start SOC 2 the same way: a large customer asks for the report, you sign up to Vanta, connect your cloud accounts and identity provider, and a dashboard lights up with dozens of failing tests. The platform is doing its job. The problem is that every one of those tests is a piece of engineering or process work that someone now has to own, and your team already has a full-time job.",
+  "Orbit3 takes ownership of the remediation. We work inside your Vanta workspace, rank the failing tests by audit risk and effort, fix the technical controls in your AWS, Azure or Google Cloud environment through infrastructure as code, run the organisational controls with you, and keep everything green through the observation window and the audit itself. If you are not on Vanta, the same approach works with Drata, Secureframe and similar platforms.",
+ ],
+ bullets=[
+  ("Gap triage in Vanta", "Every failing test ranked by risk, effort and which Trust Services Criteria it affects."),
+  ("Technical remediation", "MFA, logging, encryption, network exposure, patching, backups and change control fixed in code."),
+  ("Organisational controls", "Policies, risk assessment, vendor reviews, access reviews and training run with you, not left in a template."),
+  ("Audit-ready evidence", "Continuous, automated evidence in Vanta, plus the manual artefacts an auditor will still ask for."),
+  ("Stay green after the audit", "Under <a href=\"/Services/cloudops-managed-services/\">managed services</a>, the controls are operated and monitored every month."),
+ ],
+ panel=glance([("Platform", "Vanta (also Drata, Secureframe)"), ("Scope", "Security criteria first, then Availability and Confidentiality if needed"), ("Typical path", "Gap triage → remediation → Type I → observation → Type II"), ("Afterwards", "Controls kept green under managed services")]),
+ who={"h2": "For teams that bought Vanta and hit the wall of red",
+      "p": "Compliance automation removes the spreadsheet. It does not remove the work. These are the situations we are usually called into.",
+      "cards": [
+        {"icon": "people", "h": "SaaS vendors with a deal waiting on the report", "p": "Procurement has asked for SOC 2 and the sales cycle is on hold. You need a credible readiness date and a team that can hit it."},
+        {"icon": "shield", "h": "Startups with Vanta connected and nobody assigned", "p": "The integrations are live and the dashboard is red. Engineers are picking off tests between sprints, and the date keeps slipping."},
+        {"icon": "refresh", "h": "Companies that passed Type I and drifted", "p": "The point-in-time report went fine. Six months later, tests are failing again and the Type II observation window is at risk."},
+      ]},
+ included=[
+  ("Scoping and criteria selection", "Which systems are in scope, which Trust Services Criteria you need (Security is mandatory; Availability, Confidentiality, Processing Integrity and Privacy are optional), and what your customers actually asked for."),
+  ("Vanta workspace review", "Integrations connected correctly, in-scope resources tagged, test ownership assigned, and the failing tests triaged into a ranked backlog."),
+  ("Cloud control remediation", "Identity and MFA, audit logging, encryption at rest and in transit, network exposure, vulnerability management and patching, backup and recovery testing, fixed through Terraform or native templates so they do not drift."),
+  ("Change management and SDLC controls", "Branch protection, peer review, CI checks, separation of environments and deployment approvals, evidenced automatically from your code host and pipeline."),
+  ("Policy set", "Vanta's policy templates adapted to how your company actually operates, reviewed with you, approved and accepted by staff in the platform."),
+  ("Risk assessment and vendor management", "A risk register that reflects your real business, and vendor reviews for the SaaS tools that hold your data."),
+  ("People controls", "Onboarding and offboarding checklists, security awareness training, background checks where required, and quarterly access reviews set up as recurring tasks."),
+  ("Evidence and auditor liaison", "Manual evidence collected and organised, auditor access to Vanta configured, and questions from the audit firm answered with your team."),
+  ("Post-audit operations", "Monitoring of Vanta tests, recurring tasks completed on schedule and control drift fixed as part of managed services, so Type II renewals are routine."),
+ ],
+ how_h2="Triage, remediate, evidence, sustain",
+ how_steps=[
+  ("Triage", "We review the scope, the Vanta integrations and every failing test, and produce a ranked remediation plan with owners and a realistic readiness date. You get this whether or not you continue."),
+  ("Remediate", "We fix the technical controls in your cloud environment through infrastructure as code and run the organisational controls with you: policies, risk assessment, vendor and access reviews, training."),
+  ("Evidence and audit", "With the tests green, we collect the remaining manual evidence, set up auditor access and support your team through the Type I report and the Type II observation window."),
+ ],
+ platforms=[
+  ("Amazon Web Services", "IAM and Identity Center for MFA and least privilege, CloudTrail and Config for audit logging and configuration history, GuardDuty and Security Hub for detection, KMS and default encryption, AWS Backup with tested restores. Vanta reads all of these directly."),
+  ("Microsoft Azure", "Entra ID Conditional Access and Privileged Identity Management, Defender for Cloud, Azure Policy for enforced configuration, Monitor and Log Analytics for retained logs, Key Vault, and Azure Backup with recovery tests."),
+  ("Google Cloud", "Organisation policies and IAM with enforced 2-step verification, Cloud Audit Logs with retention, Security Command Center, CMEK where required, and Backup and DR Service with scheduled restore tests."),
+ ],
+ faqs=[
+  ("What is SOC 2 remediation?", "Remediation is the work between the gap assessment and the audit: fixing the technical controls (MFA, logging, encryption, network exposure, patching, backups, change control), putting the organisational controls in place (policies, risk assessment, vendor management, access reviews, training), and collecting evidence that they operate. In Vanta it shows up as turning failing tests green and completing the assigned tasks."),
+  ("Do we need Vanta to work with you?", "No, but it helps. Vanta automates most of the evidence collection and gives both of us one view of what is outstanding. We work the same way in Drata, Secureframe and similar platforms, and we can run a SOC 2 programme without a platform if you already have one under way."),
+  ("How long does SOC 2 remediation take?", "For a typical cloud-native company with a single production environment, remediation to a Type I-ready state takes weeks rather than months once someone owns it full time. A Type II report then needs an observation window, commonly three to twelve months, during which the controls have to keep operating. The triage step gives you a realistic date for your situation."),
+  ("Type I or Type II?", "Type I reports on the design of your controls at a point in time; Type II reports on whether they operated effectively over a period. Most enterprise customers ultimately want Type II. A common path is to remediate, obtain a Type I to unblock deals, and start the Type II observation window immediately afterwards."),
+  ("Can you work with our auditor?", "Yes. We set up auditor access in Vanta, organise the evidence the way audit firms expect, and join the calls where technical questions come up. We do not perform the audit itself; that has to be an independent CPA firm."),
+  ("What happens after the report?", "SOC 2 is annual, and controls drift the moment nobody is watching. Under our managed service the Vanta tests are monitored, recurring tasks such as access reviews and restore tests happen on schedule, and drift is fixed as it appears, so the next observation window is uneventful."),
+ ],
+ rel=["cloud-security", "cloudops-managed-services", "cloud-backup"],
+ cta={"eyebrow": "Get started", "h2": "Staring at a red Vanta dashboard?", "p": "Book a free 30-minute call. Share your screen, and we'll tell you which failing tests matter, which are quick, and how long a realistic remediation would take.", "btn": "Book a free SOC 2 triage call"},
+ service_type="SOC 2 compliance and remediation",
+ extra_sections=f'''<section class="section section--alt">
+  <div class="container split" style="align-items:start">
+    <div class="reveal">
+      <span class="eyebrow">Why Vanta</span>
+      <h2>How we use Vanta</h2>
+      <p>Vanta is a compliance automation platform. It connects to your cloud accounts, identity provider, code host, HR and device-management tools, runs automated tests against the SOC 2 criteria continuously, and gives your auditor a single place to review evidence. It replaces the spreadsheet and the screenshot folder.</p>
+      <p>What it cannot do is change your infrastructure or run your processes. That is where we come in. We treat the Vanta dashboard as the shared backlog: every failing test gets an owner, a fix and a date, and the tests stay green because the fixes are made in code and the tasks are operated, not just ticked.</p>
+      <!-- TODO (Martin): if Orbit3 holds Vanta partner status (MSP or service partner), state it here and add the partner directory URL to sameAs in the Organization schema. -->
+      <p>Read our guide: <a href="/insights/soc-2-remediation-guide/" style="color:var(--accent)">SOC 2 remediation: how to close the gaps Vanta finds</a>.</p>
+    </div>
+    <ul class="checklist checklist--grid reveal">
+      <li>{I["check"]}<span><strong>Integrations done right</strong>Every in-scope account connected, resources tagged, tests assigned.</span></li>
+      <li>{I["check"]}<span><strong>Tests fixed at the source</strong>Cloud controls changed in Terraform so the fix cannot drift.</span></li>
+      <li>{I["check"]}<span><strong>Policies that match reality</strong>Templates adapted to how you actually work, then approved and accepted.</span></li>
+      <li>{I["check"]}<span><strong>Recurring tasks operated</strong>Access reviews, restore tests, vendor reviews and training on schedule.</span></li>
+      <li>{I["check"]}<span><strong>Auditor-ready evidence</strong>Automated evidence plus the manual artefacts organised in one place.</span></li>
+      <li>{I["check"]}<span><strong>Continuous monitoring</strong>Failing tests caught and fixed as part of managed operations.</span></li>
+    </ul>
+  </div>
+</section>''',
+)
+
 # =====================================================================================
 #  SERVICES OVERVIEW
 # =====================================================================================
@@ -911,10 +1005,10 @@ def services_index():
             "hasPart": [{"@type": "Service", "name": n, "url": SITE + SURL[s]} for s, n in SERVICES]}
     website = {"@type": "WebSite", "@id": f"{SITE}/#website", "url": f"{SITE}/", "name": "Orbit3", "publisher": {"@id": f"{SITE}/#organization"}}
     spec = ""
-    for s in ["cloud-adoption", "cloud-security", "cloud-optimisation", "cloud-devops", "cloud-backup"]:
-        icon = {"cloud-adoption": "map", "cloud-security": "lock", "cloud-optimisation": "coins", "cloud-devops": "rocket", "cloud-backup": "server"}[s]
+    for s in ["cloud-adoption", "cloud-security", "soc2-compliance", "cloud-optimisation", "cloud-devops", "cloud-backup"]:
+        icon = {"cloud-adoption": "map", "cloud-security": "lock", "soc2-compliance": "shield", "cloud-optimisation": "coins", "cloud-devops": "rocket", "cloud-backup": "server"}[s]
         spec += f'<div class="card card--feature reveal"><span class="card-icon">{I[icon]}</span><h3><a href="{SURL[s]}">{SNAME[s]}</a></h3><p>{BLURB[s]}</p><a class="link-arrow" href="{SURL[s]}">Learn more {I["arrow"]}</a></div>'
-    spec += f'<div class="card card--feature reveal"><span class="card-icon">{I["people"]}</span><h3>Not sure where to start?</h3><p>Tell us what&#39;s slowing you down and we&#39;ll point you to the right starting place, honestly, even if that&#39;s not us.</p><a class="link-arrow" href="{CAL}" target="_blank" rel="noopener noreferrer">Book a call {I["arrow"]}</a></div>'
+    if False: spec += f'<div class="card card--feature reveal"><span class="card-icon">{I["people"]}</span><h3>Not sure where to start?</h3><p>Tell us what&#39;s slowing you down and we&#39;ll point you to the right starting place, honestly, even if that&#39;s not us.</p><a class="link-arrow" href="{CAL}" target="_blank" rel="noopener noreferrer">Book a call {I["arrow"]}</a></div>'
     body = f'''<section class="page-hero center">
   <div class="aurora" aria-hidden="true"><span class="blob"></span></div>
   <div class="hero-grid-overlay" aria-hidden="true"></div>
@@ -965,10 +1059,10 @@ def home():
     path = "/"
     website = {"@type": "WebSite", "@id": f"{SITE}/#website", "url": f"{SITE}/", "name": "Orbit3", "publisher": {"@id": f"{SITE}/#organization"}}
     grid = ""
-    icons = {"cloudops-managed-services": "cloud", "ai-solutions": "robot", "cloud-adoption": "map", "cloud-security": "lock", "cloud-optimisation": "coins", "cloud-devops": "rocket", "cloud-backup": "server"}
+    icons = {"cloudops-managed-services": "cloud", "ai-solutions": "robot", "cloud-adoption": "map", "cloud-security": "lock", "soc2-compliance": "shield", "cloud-optimisation": "coins", "cloud-devops": "rocket", "cloud-backup": "server"}
     for s, n in SERVICES:
         grid += f'<a class="card card--link reveal" href="{SURL[s]}"><span class="card-icon">{I[icons[s]]}</span><h3>{n}</h3><p>{BLURB[s]}</p><span class="link-arrow">Learn more {I["arrow"]}</span></a>'
-    grid += f'<a class="card card--link card--primary reveal" href="{CAL}" target="_blank" rel="noopener noreferrer"><span class="card-icon">{I["people"]}</span><h3>Not sure where to start?</h3><p>Tell us what is slowing you down and we will point you to the right first step, honestly, even if that is not us.</p><span class="link-arrow">Book a free call {I["arrow"]}</span></a>'
+    if False: grid += f'<a class="card card--link card--primary reveal" href="{CAL}" target="_blank" rel="noopener noreferrer"><span class="card-icon">{I["people"]}</span><h3>Not sure where to start?</h3><p>Tell us what is slowing you down and we will point you to the right first step, honestly, even if that is not us.</p><span class="link-arrow">Book a free call {I["arrow"]}</span></a>'
     body = f'''<section class="hero center">
   <div class="aurora" aria-hidden="true"><span class="blob"></span></div>
   <div class="hero-grid-overlay" aria-hidden="true"></div>
@@ -1046,7 +1140,7 @@ def home():
 </section>
 <section class="section">
   <div class="container">
-    <div class="center measure" style="margin-bottom:44px"><span class="eyebrow eyebrow--center">Everything we do</span><h2>Seven services, one accountable team</h2><p>Start with the one that solves today's problem. Most clients add more once the day-to-day is under control.</p></div>
+    <div class="center measure" style="margin-bottom:44px"><span class="eyebrow eyebrow--center">Everything we do</span><h2>Eight services, one accountable team</h2><p>Start with the one that solves today's problem. Most clients add more once the day-to-day is under control.</p></div>
     <div class="grid grid-4 grid--services">{grid}</div>
   </div>
 </section>
@@ -1202,11 +1296,231 @@ def contact():
 contact()
 
 # =====================================================================================
+#  INSIGHTS (blog)
+# =====================================================================================
+AUTHOR = {"@type": "Person", "@id": f"{SITE}/about/#founder", "name": "Martin", "jobTitle": "Founder, Orbit3", "url": f"{SITE}/about/"}
+
+SOC2_GUIDE_BODY = '''
+<p>You connected AWS, Google Workspace and GitHub to Vanta on Monday. By Tuesday the dashboard showed 60-odd failing tests, a policy library nobody has read, and a list of tasks assigned to people who did not know they were on the hook. Welcome to SOC 2 remediation: the part of the project that sits between "we bought the tool" and "we have the report", and the part where most SOC 2 timelines quietly slip.</p>
+<p>This guide is for founders, CTOs and the engineer who drew the short straw. It explains what remediation actually involves, why the first Vanta scan looks so bad, which gaps to fix first, how to sequence the work into a realistic plan, and the mistakes that turn a six-week project into a six-month one.</p>
+
+<h2 id="what-is-remediation">What SOC 2 remediation actually means</h2>
+<p>SOC 2 is an attestation report, written by an independent CPA firm, on the controls your company operates against the AICPA's <strong>Trust Services Criteria</strong>. The Security criteria (also called the Common Criteria) are mandatory. Availability, Confidentiality, Processing Integrity and Privacy are optional and you include them only if your customers need them.</p>
+<p>A SOC 2 project has four phases, and remediation is the third:</p>
+<ol>
+  <li><strong>Scoping.</strong> Which systems, which people, which criteria, and whether you are going for a Type I or a Type II report.</li>
+  <li><strong>Gap assessment.</strong> Comparing what you actually do against what the criteria require. In Vanta this is largely automated: the integrations run tests continuously and each failing test is a gap.</li>
+  <li><strong>Remediation.</strong> Closing the gaps. Changing cloud configuration, writing and adopting policies, setting up recurring processes, and producing evidence that all of it happens.</li>
+  <li><strong>Audit.</strong> A Type I examines control design at a point in time. A Type II examines whether the controls operated effectively over an observation window, commonly three to twelve months.</li>
+</ol>
+<p>Remediation is where the engineering lives. Vanta will tell you that an S3 bucket is public or that three staff have not completed security training. It will not make the bucket private or sit the training for them. Someone has to own each item, and that ownership gap is the single biggest reason SOC 2 projects stall.</p>
+
+<h2 id="why-vanta-is-red">Why Vanta shows so many failing tests on day one</h2>
+<p>Compliance automation platforms work by connecting to the systems where your controls live and checking them against the criteria on a schedule. Vanta's integrations cover cloud providers (AWS, Azure, Google Cloud), identity providers (Google Workspace, Microsoft Entra, Okta), code hosts (GitHub, GitLab), HR systems, device management and a long tail of SaaS tools. Each integration enables a set of automated tests.</p>
+<p>The first scan is red for three reasons:</p>
+<ul>
+  <li><strong>It tests everything in the connected account</strong>, including the sandbox project from two years ago and the database nobody remembers. Before you fix anything, mark what is out of scope so the dashboard reflects the environment you are actually attesting to.</li>
+  <li><strong>Cloud defaults are not SOC 2 defaults.</strong> A fresh cloud account does not have audit logging retained for a year, encryption enforced everywhere, MFA required for every human, or alerts routed to a person. All of that is configuration you have to add.</li>
+  <li><strong>Half the tests are about people, not systems.</strong> Policy acceptance, security training, background checks, offboarding, access reviews and vendor reviews all fail until the underlying process exists and has been run at least once.</li>
+</ul>
+<p>A typical first scan for a cloud-native company of 20 to 100 people looks something like this:</p>
+<div class="table-wrap"><table>
+  <thead><tr><th>Area</th><th>What typically fails</th><th>Who fixes it</th></tr></thead>
+  <tbody>
+    <tr><td>Identity and access</td><td>MFA not enforced for all users, root or owner accounts in daily use, no quarterly access review, shared credentials</td><td>Engineering</td></tr>
+    <tr><td>Logging and monitoring</td><td>Audit logs not enabled in every region, retention shorter than a year, no alerting on suspicious activity</td><td>Engineering</td></tr>
+    <tr><td>Encryption</td><td>Unencrypted volumes, snapshots or databases; buckets without default encryption; TLS not enforced</td><td>Engineering</td></tr>
+    <tr><td>Network exposure</td><td>Public storage buckets, security groups open to the internet, databases with public endpoints</td><td>Engineering</td></tr>
+    <tr><td>Vulnerability management</td><td>No scanning, findings older than the SLA, unpatched instances or containers</td><td>Engineering</td></tr>
+    <tr><td>Change management</td><td>No branch protection, changes merged without review, production deployed from laptops</td><td>Engineering</td></tr>
+    <tr><td>Backup and recovery</td><td>Backups not enabled for every data store, no restore test on record, no documented recovery plan</td><td>Engineering</td></tr>
+    <tr><td>Policies</td><td>Policies not written, not approved, or not accepted by staff</td><td>Leadership</td></tr>
+    <tr><td>People</td><td>Security training incomplete, background checks missing, offboarding not evidenced</td><td>Operations / HR</td></tr>
+    <tr><td>Vendors and risk</td><td>No vendor inventory or reviews, no risk assessment on record</td><td>Leadership</td></tr>
+  </tbody>
+</table></div>
+
+<h2 id="fix-first">The eight gaps to fix first</h2>
+<p>Not every failing test carries the same weight. Auditors focus on the controls that protect customer data and on whether you can show they operate consistently. This is the order we work in, because it removes the most audit risk per hour of effort.</p>
+
+<h3>1. Identity and multi-factor authentication</h3>
+<p>Enforce MFA for every human account in your identity provider and your cloud consoles, retire shared logins, stop using root or global-admin accounts for day-to-day work, and put a break-glass procedure around them. In AWS that means IAM Identity Center or SSO with MFA enforced by policy; in Azure, Conditional Access; in Google Cloud, enforced 2-step verification at the organisation level. This is the control auditors ask about first and it usually clears a cluster of tests at once.</p>
+
+<h3>2. Audit logging and retention</h3>
+<p>Turn on audit logging in every region and every account (CloudTrail organisation trails, Azure Activity Log to Log Analytics, Cloud Audit Logs with a retained sink), set retention to at least a year, protect the logs from deletion, and route at least a handful of high-signal alerts to a channel someone reads. You need the logs to exist before the observation window starts, because the auditor will sample from it.</p>
+
+<h3>3. Encryption at rest and in transit</h3>
+<p>Enable default encryption for block storage, object storage, databases and snapshots. Enforce TLS on load balancers and storage endpoints. Most of this is a one-line setting per service, and once it is in infrastructure code it stays fixed.</p>
+
+<h3>4. Network exposure</h3>
+<p>Close public buckets, remove 0.0.0.0/0 rules that are not on a load balancer, move databases to private subnets and put a bastion or a zero-trust proxy in front of anything that must be reachable. Vanta's tests here are blunt, which is helpful: they will not go green until the exposure is actually gone.</p>
+
+<h3>5. Vulnerability management and patching</h3>
+<p>Turn on the native scanner (Amazon Inspector, Defender for Cloud, Security Command Center), add dependency and container scanning to CI, and define a remediation SLA by severity that you can actually meet. Then meet it. The test is not "do you scan" but "do you fix findings within the time your own policy states".</p>
+
+<h3>6. Backup and restore testing</h3>
+<p>Every in-scope data store needs an automated backup with a retention policy, and you need at least one documented restore test on record before the audit. If you have never restored from a backup, do it during remediation and keep the timing and the screenshot. Our <a href="/Services/cloud-backup/">cloud backup service</a> covers this in more depth.</p>
+
+<h3>7. Change management</h3>
+<p>Branch protection on the production branch, mandatory peer review, CI checks that must pass, and a deploy path that goes through the pipeline rather than a laptop. Vanta evidences this straight from GitHub or GitLab, so once the settings are on, the tests stay green without anyone doing anything.</p>
+
+<h3>8. Access reviews and offboarding</h3>
+<p>Set up a quarterly access review as a recurring task in Vanta, run the first one now, and write the offboarding checklist so that the next leaver's access is removed within your policy's timeframe and the evidence is captured. Auditors sample joiners and leavers during the observation window, and this is where Type II exceptions most often come from.</p>
+
+<h2 id="technical-vs-organisational">Technical gaps versus organisational gaps</h2>
+<p>Engineering can close the first seven items above in a few focused weeks. The organisational controls take longer in calendar time, not because they are hard but because they involve people and recurring dates:</p>
+<ul>
+  <li><strong>Policies.</strong> Vanta ships templates for every policy SOC 2 expects. Do not accept them verbatim. Edit each one to describe what your company actually does, because the auditor will test your practice against your policy, and a policy that promises a 30-day patch SLA you do not meet is worse than one that promises 60 and does.</li>
+  <li><strong>Risk assessment.</strong> A written, dated assessment of the risks to your service and what you do about them, reviewed at least annually. It should mention your real risks, not generic ones.</li>
+  <li><strong>Vendor management.</strong> An inventory of the third parties that touch customer data, with a review of each (their SOC 2 report, their security page, a questionnaire) and a record of the decision.</li>
+  <li><strong>Security awareness training.</strong> Every employee, on joining and annually. Vanta tracks completion.</li>
+  <li><strong>Background checks.</strong> Where your policy and local law require them, evidenced through your HR system.</li>
+</ul>
+<div class="callout"><p><strong>Rule of thumb:</strong> a technical control is done when it is in code. An organisational control is done when it has run once, on the date it was supposed to, with evidence. A control that exists only as a document is not done.</p></div>
+
+<h2 id="sequence">A realistic sequence: the 90-day plan</h2>
+<p>Timelines vary with the size of the environment and how much attention the work gets, but for a single-product SaaS company with one production environment, this sequence works:</p>
+<ol>
+  <li><strong>Weeks 1 to 2: scope and triage.</strong> Decide the criteria, mark out-of-scope resources in Vanta, assign an owner to every failing test and rank the backlog by audit risk and effort. Agree the target: usually Type I first.</li>
+  <li><strong>Weeks 3 to 6: technical remediation.</strong> Work the eight areas above, in that order, through infrastructure as code. Re-run the Vanta tests as you go rather than at the end.</li>
+  <li><strong>Weeks 7 to 10: organisational controls.</strong> Finalise and approve policies, run the risk assessment, complete vendor reviews, get training and policy acceptance to 100 percent, and run the first access review.</li>
+  <li><strong>Weeks 11 to 12: evidence and pre-audit.</strong> Collect the manual evidence Vanta cannot automate, give the auditor access, and walk through the environment with them before fieldwork.</li>
+  <li><strong>Then: the observation window.</strong> If you want a Type II, the window starts once the controls are in place. During it, the recurring tasks must actually happen on schedule. Nothing in this phase is difficult, but all of it has to be done.</li>
+</ol>
+
+<h2 id="mistakes">Five mistakes that stall SOC 2 remediation</h2>
+<ol>
+  <li><strong>Fixing tests by hand in the console.</strong> The test goes green today and red again in a month when someone recreates the resource. Make the change in Terraform, CloudFormation, Bicep or whatever your environment is defined in. If it is not defined in code, that is your first remediation item.</li>
+  <li><strong>Scoping too broadly.</strong> Attesting to every account, environment and tool you own multiplies the work. Scope to the systems that process customer data and the people who can access them.</li>
+  <li><strong>Treating a green dashboard as audit-ready.</strong> Vanta's tests cover what it can see through integrations. Auditors will also ask for things it cannot see: meeting minutes, incident records, the restore test, the signed vendor review. Keep a folder for these from week one.</li>
+  <li><strong>Ignoring the observation window.</strong> Teams sprint to a Type I and then relax. Every missed access review or late restore test during the Type II window becomes an exception in the report that your customers will read.</li>
+  <li><strong>Having no single owner.</strong> Remediation is an engineering project with a backlog and a date, and it needs the same ownership as any other. If nobody's name is on it, it will not happen between sprints.</li>
+</ol>
+
+<h2 id="type-1-vs-type-2">Type I or Type II: what to remediate for</h2>
+<p>Remediate for Type II from the start, even if the first report you obtain is a Type I. The controls are the same; the difference is that Type II proves they operate over time. Designing them from the beginning as recurring, evidenced processes costs nothing extra and avoids a second remediation effort when the observation window begins. Most enterprise procurement teams accept a Type I as a bridge and expect a Type II to follow.</p>
+
+<h2 id="orbit3">Where Orbit3 fits</h2>
+<p>We run <a href="/Services/soc2-compliance/">SOC 2 remediation as a service</a>, working inside your Vanta workspace. We triage the failing tests, fix the cloud controls in code, run the organisational controls with you, organise the evidence and support the audit. For most clients the work then rolls into <a href="/Services/cloudops-managed-services/">managed cloud operations</a>, where the Vanta tests are monitored and the recurring tasks are operated every month, so the next observation window is uneventful. If you are on Drata or Secureframe instead of Vanta, the approach is identical.</p>
+<p>If you are looking at a red dashboard and a date you are not sure you can hit, <a href="/contact/">get in touch</a>. Share your screen on a free 30-minute call and we will tell you which tests matter, which are quick, and how long a realistic remediation would take.</p>
+'''
+
+POSTS = [
+ {
+  "slug": "soc-2-remediation-guide",
+  "title": "SOC 2 Remediation: How to Close the Gaps Vanta Finds",
+  "seo_title": "SOC 2 Remediation Guide: Fixing the Gaps Vanta Finds | Orbit3",
+  "desc": "A practical SOC 2 remediation guide: why Vanta shows failing tests on day one, the eight gaps to fix first, a 90-day plan, and the mistakes that stall the audit.",
+  "category": "Compliance",
+  "date": "2026-09-02", "updated": "2026-09-02",
+  "summary": "Why the first Vanta scan is red, which failing tests to fix first, how to sequence remediation into a 90-day plan, and the five mistakes that turn a six-week project into a six-month one.",
+  "keywords": ["SOC 2 remediation", "SOC 2 compliance", "Vanta", "SOC 2 gap assessment", "SOC 2 Type II", "Trust Services Criteria", "compliance automation"],
+  "body": SOC2_GUIDE_BODY,
+  "faqs": [
+   ("How long does SOC 2 remediation take with Vanta?", "For a cloud-native company with one production environment and an owner assigned full time, technical remediation typically takes a few weeks and organisational controls a few more. A Type I report can follow soon after; a Type II needs an observation window of three to twelve months during which the controls keep operating."),
+   ("Does Vanta fix the failing tests for you?", "No. Vanta detects gaps and collects evidence through its integrations. Fixing a failing test means changing your cloud configuration, adopting a policy or running a process, which your team or a partner such as Orbit3 has to do."),
+   ("Which SOC 2 criteria do we need?", "The Security criteria are mandatory. Availability, Confidentiality, Processing Integrity and Privacy are optional. Ask your customers what they need; most SaaS companies start with Security and add Availability or Confidentiality when a customer contract requires it."),
+   ("Should we get a Type I or go straight to Type II?", "A common path is to obtain a Type I to unblock deals, then start the Type II observation window immediately. Remediate for Type II from the start, because the controls are the same and only the evidence period differs."),
+   ("What evidence does Vanta not collect automatically?", "Anything that does not live in an integrated system: incident records, meeting minutes for risk reviews, restore test results, signed vendor assessments and some HR documents. Keep a folder for these from the start of remediation."),
+  ],
+  "related": ["soc2-compliance", "cloud-security", "cloudops-managed-services"],
+ },
+]
+
+def reading_time(html_body):
+    words = len(re.sub(r"<[^>]+>", " ", html_body).split())
+    return words, max(1, round(words / 220))
+
+def post_page(post):
+    path = f"/insights/{post['slug']}/"
+    url = SITE + path
+    crumb_ld, crumb_html = crumbs([("Home", "/"), ("Insights", "/insights/"), (post["title"], None)])
+    faq_ld, faq_html = faq_section(post["faqs"])
+    words, mins = reading_time(post["body"])
+    article = {"@type": "BlogPosting", "@id": url + "#article", "headline": post["title"], "description": post["desc"], "url": url,
+               "mainEntityOfPage": {"@type": "WebPage", "@id": url}, "datePublished": post["date"], "dateModified": post["updated"],
+               "author": AUTHOR, "publisher": {"@id": f"{SITE}/#organization"},
+               "image": f"{SITE}/images/og-image.png", "articleSection": post["category"], "keywords": ", ".join(post["keywords"]),
+               "wordCount": words, "inLanguage": "en-GB", "isPartOf": {"@id": f"{SITE}/insights/#blog"}}
+    toc = "".join(f'<li><a href="#{m.group(1)}">{m.group(2)}</a></li>' for m in re.finditer(r'<h2 id="([^"]+)">(.*?)</h2>', post["body"]))
+    nice_date = __import__("datetime").date.fromisoformat(post["date"]).strftime("%-d %B %Y")
+    rel_cards = "".join(f'<a class="card card--link reveal" href="{SURL[s]}"><h3>{SNAME[s]}</h3><p>{BLURB[s]}</p><span class="link-arrow">Learn more {I["arrow"]}</span></a>' for s in post["related"])
+    body = f'''<section class="page-hero center">
+  <div class="aurora" aria-hidden="true"><span class="blob"></span></div>
+  <div class="hero-grid-overlay" aria-hidden="true"></div>
+  <div class="container">
+    {crumb_html}
+    <span class="eyebrow eyebrow--center">{post["category"]}</span>
+    <h1 class="measure" style="font-size:clamp(2rem,4.4vw,3.3rem)">{post["title"]}</h1>
+    <p class="lede measure">{post["summary"]}</p>
+    <div class="post-meta"><span>By <a href="/about/">Martin, Founder</a></span><span>Published <time datetime="{post["date"]}">{nice_date}</time></span><span>{mins} min read</span></div>
+  </div>
+</section>
+<article class="section" style="padding-top:16px">
+  <div class="container post">
+    <nav class="toc" aria-label="In this article"><div class="toc-title">In this guide</div><ol>{toc}</ol></nav>
+    <div class="prose">{post["body"]}</div>
+    <div class="card card--primary author-card mt-2">
+      <span class="card-icon">{I["people"]}</span>
+      <div><h3 style="font-size:1.1rem">About the author</h3><p>Martin is the founder of Orbit3, a managed cloud services and AI consultancy. He works directly with every client on cloud operations, security and compliance. <a href="/about/" style="color:var(--accent)">More about Orbit3</a>.</p></div>
+    </div>
+  </div>
+</article>
+{faq_html}
+<section class="section">
+  <div class="container">
+    <div class="center measure" style="margin-bottom:40px"><span class="eyebrow eyebrow--center">Related services</span><h2>How we can help</h2></div>
+    <div class="grid grid-3">{rel_cards}</div>
+  </div>
+</section>
+{cta_band("Get started", "Staring at a red Vanta dashboard?", "Book a free 30-minute call. Share your screen and we'll tell you which failing tests matter, which are quick, and how long a realistic remediation would take.", "Book a free SOC 2 triage call")}
+'''
+    html_out = head(path, post["seo_title"], post["desc"], [ORG, article, crumb_ld, faq_ld]) + header(path) + body + footer()
+    html_out = html_out.replace('<meta property="og:type" content="website">', '<meta property="og:type" content="article">\n<meta property="article:published_time" content="' + post["date"] + '">\n<meta property="article:modified_time" content="' + post["updated"] + '">\n<meta property="article:author" content="' + SITE + '/about/">')
+    write(path, html_out)
+
+def insights_index():
+    path = "/insights/"
+    crumb_ld, crumb_html = crumbs([("Home", "/"), ("Insights", None)])
+    blog = {"@type": "Blog", "@id": f"{SITE}/insights/#blog", "url": SITE + path, "name": "Orbit3 Insights",
+            "description": "Practical guides on managed cloud operations, security, compliance, cost and AI from Orbit3.",
+            "publisher": {"@id": f"{SITE}/#organization"},
+            "blogPost": [{"@type": "BlogPosting", "@id": f"{SITE}/insights/{p['slug']}/#article", "headline": p["title"], "url": f"{SITE}/insights/{p['slug']}/", "datePublished": p["date"]} for p in POSTS]}
+    cards = ""
+    for p in sorted(POSTS, key=lambda x: x["date"], reverse=True):
+        words, mins = reading_time(p["body"])
+        nice_date = __import__("datetime").date.fromisoformat(p["date"]).strftime("%-d %B %Y")
+        cards += f'<a class="card card--link reveal" href="/insights/{p["slug"]}/"><div class="post-kicker"><span class="cat">{p["category"]}</span><span>{nice_date}</span><span>{mins} min read</span></div><h2 style="font-size:clamp(1.3rem,2.2vw,1.7rem)">{p["title"]}</h2><p>{p["summary"]}</p><span class="link-arrow">Read the guide {I["arrow"]}</span></a>'
+    body = f'''<section class="page-hero center">
+  <div class="aurora" aria-hidden="true"><span class="blob"></span></div>
+  <div class="hero-grid-overlay" aria-hidden="true"></div>
+  <div class="container">
+    {crumb_html}
+    <h1 class="measure">Insights</h1>
+    <p class="lede measure">Practical guides on running cloud operations, passing audits, controlling spend and shipping AI, written by the people who do it for clients every week.</p>
+  </div>
+</section>
+<section class="section" style="padding-top:8px">
+  <div class="container" style="max-width:860px">
+    <div class="post-list">{cards}</div>
+  </div>
+</section>
+{cta_band("Get in touch", "Have a question these guides don't answer?", "Book a free 30-minute call or send a message. We reply within one business day.")}
+'''
+    write(path, head(path, "Insights: Cloud, Compliance & AI Guides | Orbit3",
+                     "Practical guides from Orbit3 on managed cloud operations, SOC 2 compliance, cloud security, cost optimisation and AI implementation.",
+                     [ORG, blog, crumb_ld]) + header(path) + body + footer())
+
+for _p in POSTS:
+    post_page(_p)
+insights_index()
+
+# =====================================================================================
 #  SITEMAP (HTML) and 404
 # =====================================================================================
 def sitemap_html():
     path = "/sitemap.html"
-    links = [("Home", "/"), ("Services", "/Services/")] + [(n, SURL[s]) for s, n in SERVICES] + [("About Orbit3", "/about/"), ("Contact", "/contact/")]
+    links = [("Home", "/"), ("Services", "/Services/")] + [(n, SURL[s]) for s, n in SERVICES] + [("Insights", "/insights/")] + [(pp["title"], f"/insights/{pp['slug']}/") for pp in POSTS] + [("About Orbit3", "/about/"), ("Contact", "/contact/")]
     lis = "".join(f'<li>{I["check"]}<span><a href="{u}" style="color:var(--fg)">{n}</a></span></li>' for n, u in links)
     body = f'''<section class="page-hero center">
   <div class="aurora" aria-hidden="true"><span class="blob"></span></div>
@@ -1269,7 +1583,7 @@ def not_found():
 <section class="section" style="padding-top:8px">
   <div class="container">
     <h2 class="center" style="margin-bottom:32px">Where to next</h2>
-    <div class="grid grid-4 grid--services">{links}</div>
+    <div class="grid grid-3 grid--services">{links}</div>
   </div>
 </section>
 ''' + legacy_js(legacy)
@@ -1297,8 +1611,8 @@ stub("/about-us.html", "/about/", "About")
 #  sitemap.xml and robots.txt
 # =====================================================================================
 urls = [("/", "1.0"), ("/Services/", "0.9"), (SURL["cloudops-managed-services"], "0.9"), (SURL["ai-solutions"], "0.9"),
-        (SURL["cloud-adoption"], "0.7"), (SURL["cloud-security"], "0.7"), (SURL["cloud-optimisation"], "0.7"), (SURL["cloud-devops"], "0.7"), (SURL["cloud-backup"], "0.7"),
-        ("/about/", "0.6"), ("/contact/", "0.6")]
+        (SURL["cloud-adoption"], "0.7"), (SURL["cloud-security"], "0.7"), (SURL["soc2-compliance"], "0.8"), (SURL["cloud-optimisation"], "0.7"), (SURL["cloud-devops"], "0.7"), (SURL["cloud-backup"], "0.7"),
+        ("/about/", "0.6"), ("/contact/", "0.6"), ("/insights/", "0.6")] + [(f"/insights/{pp['slug']}/", "0.7") for pp in POSTS]
 sm = '<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n'
 for u, p in urls:
     sm += f"  <url><loc>{SITE}{u}</loc><lastmod>{TODAY}</lastmod><changefreq>monthly</changefreq><priority>{p}</priority></url>\n"
