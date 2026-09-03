@@ -8,7 +8,7 @@ SITE = "https://orbit3.io"
 CAL = "https://calendly.com/martin-orbit3/introductory-call"
 LINKEDIN = "https://linkedin.com/company/orbit3"
 GA = "G-YT6G7B299N"
-TODAY = "2026-09-02"
+TODAY = "2026-09-03"
 CSS_VER = hashlib.sha1(open("css/orbit3.css", "rb").read()).hexdigest()[:8]
 
 # ---------------------------------------------------------------- icons
@@ -544,6 +544,7 @@ service_page(
  intro_paras=[
   "Most AI projects stall between a promising demo and a system you can actually depend on. The demo answers questions from ten documents; production has to answer them from ten thousand, with the right permissions, without making things up, at a cost you can predict. Orbit3 closes that gap.",
   "We scope the right use case, build it on secure cloud foundations, integrate it with your existing tools and data, and then keep it running. Because we already run <a href=\"/Services/cloudops-managed-services/\">managed cloud operations</a> for our clients, your AI doesn't become another silo. It is monitored, secured and maintained as part of one accountable operation.",
+  "Running agents that can execute code? Read our guide: <a href=\"/insights/sandboxing-ai-workloads/\">Sandboxing AI workloads and securing agents across the engineering pipeline</a>.",
  ],
  bullets=[
   ("Custom AI &amp; LLM applications", "Retrieval-augmented generation, copilots and assistants grounded in your own data."),
@@ -1406,7 +1407,247 @@ SOC2_GUIDE_BODY = '''
 <p>If you are looking at a red dashboard and a date you are not sure you can hit, <a href="/contact/">get in touch</a>. Share your screen on a free 30-minute call and we will tell you which tests matter, which are quick, and how long a realistic remediation would take.</p>
 '''
 
+SANDBOX_BODY = '''
+<p>Every AI agent that can run code is, functionally, a remote code execution endpoint that you deployed on purpose. The model writes a script, your infrastructure runs it, and whatever that script does happens with whatever privileges you gave it. That would be alarming enough if models only produced the code you asked for. They don't. Models also read: repository contents, issue threads, pull request descriptions, web pages, tool outputs. Any of those can carry instructions the model will treat as its own.</p>
+<p>This guide is a practical map of the problem. It covers the isolation options for running AI-generated code, how to stand them up on Google Cloud, AWS and your own machine, and then the part most teams skip: how to keep agents contained when they live inside your engineering workflow and your CI/CD pipeline, where they hold the keys to everything.</p>
+
+<h2 id="threats">Three things you are actually defending against</h2>
+<p>Before picking a sandbox, be clear about the threats, because each one wants a different control.</p>
+<ul>
+  <li><strong>Untrusted code.</strong> The agent writes a program and you execute it. Bugs, infinite loops, <code>rm -rf</code> and deliberate exploits all live here. This is what compute isolation (containers, gVisor, microVMs) addresses.</li>
+  <li><strong>Untrusted input, also known as prompt injection.</strong> The agent reads something an attacker controlled and follows the instructions embedded in it. No amount of kernel isolation helps, because the model is doing exactly what it was designed to do. The controls here are network egress restriction, tool permissioning, and human review at the points where actions become irreversible.</li>
+  <li><strong>Over-privileged identity.</strong> The agent runs with an IAM role, a <code>GITHUB_TOKEN</code> or an API key that can do far more than the task requires. When either of the first two threats materialises, this is what turns a contained incident into a breach. The control is boring and essential: least privilege, short-lived credentials, and keeping secrets out of the agent's reach entirely.</li>
+</ul>
+<div class="callout"><p>Most published incidents involve the second and third, not the first. The sandbox held; the network and the credentials did not. Keep that in mind as you read the rest.</p></div>
+
+<h2 id="isolation-ladder">The isolation ladder</h2>
+<p>These are the compute isolation options, ordered from weakest to strongest. The mental model: containers isolate namespaces, gVisor isolates the kernel API, microVMs isolate the kernel itself. Choose the lowest rung you can operate, then stack the higher ones on top as defence in depth.</p>
+
+<h3>Language-level and WASM sandboxes</h3>
+<p>RestrictedPython, Pyodide, Wasmtime, Deno's permission flags, V8 isolates.</p>
+<ul>
+  <li><strong>Pros:</strong> effectively zero startup cost, trivially embeddable, and WASM has a real capability model.</li>
+  <li><strong>Cons:</strong> restriction at the Python language level is escapable and should not be treated as a security boundary. WASM confines you to what compiles to it: no arbitrary pip packages, no native libraries, no GPU.</li>
+  <li><strong>Use for:</strong> formula evaluation, data formatting, browser-side analysis. Not for "run whatever the agent produced".</li>
+</ul>
+
+<h3>Hardened containers</h3>
+<p>Docker or Podman with seccomp, dropped capabilities, <code>no-new-privileges</code>, a read-only root filesystem, a non-root user, cgroup limits and <code>--network none</code>.</p>
+<ul>
+  <li><strong>Pros:</strong> works everywhere, runs any image, fast, and GPU passthrough is straightforward.</li>
+  <li><strong>Cons:</strong> shares the host kernel. A kernel exploit is a full escape.</li>
+  <li><strong>Use for:</strong> semi-trusted code, or as a layer inside a stronger boundary.</li>
+</ul>
+
+<h3>User-space kernels (gVisor)</h3>
+<p>gVisor's <code>runsc</code> intercepts syscalls in user space so the host kernel sees only a tiny surface. It is a drop-in OCI runtime and is what Modal, Beam, Cloud Run and GKE Sandbox use under the hood.</p>
+<ul>
+  <li><strong>Pros:</strong> sub-second starts, minimal operational change, and a strong reduction in kernel attack surface.</li>
+  <li><strong>Cons:</strong> syscall compatibility gaps break some tools, syscall-heavy workloads slow down noticeably, and GPU support is narrower than native.</li>
+  <li><strong>Use for:</strong> the default for most code-interpreter and coding-agent workloads.</li>
+</ul>
+
+<h3>MicroVMs (Firecracker, Cloud Hypervisor, Kata Containers)</h3>
+<p>A hardware-virtualised boundary with boot times in the low hundreds of milliseconds and snapshot and restore for warm pools. Firecracker underpins Lambda, Fargate, Bedrock AgentCore, E2B and Vercel Sandbox.</p>
+<ul>
+  <li><strong>Pros:</strong> kernel-level separation, fast enough for per-session VMs, and Kata lets you keep using OCI images.</li>
+  <li><strong>Cons:</strong> needs KVM (bare metal or nested virtualisation), more operational weight, GPU passthrough is doable but fiddly, and the hypervisor is still attack surface.</li>
+  <li><strong>Use for:</strong> adversarial or multi-tenant workloads where you cannot accept a shared kernel.</li>
+</ul>
+
+<h3>Full VMs and dedicated hosts</h3>
+<p>One VM per tenant or per session, with an autoscaling pool.</p>
+<ul>
+  <li><strong>Pros:</strong> the strongest practical boundary, native GPUs, no compatibility surprises.</li>
+  <li><strong>Cons:</strong> tens of seconds to start, expensive, and needs pooling to be usable.</li>
+  <li><strong>Use for:</strong> GPU-heavy or regulated workloads.</li>
+</ul>
+
+<h3>Managed sandbox services</h3>
+<p>E2B, Modal Sandboxes, Daytona, Vercel Sandbox, Northflank, Beam, plus the cloud-native offerings covered below.</p>
+<ul>
+  <li><strong>Pros:</strong> an SDK that does create, exec and destroy for you, warm pools, and nothing to run.</li>
+  <li><strong>Cons:</strong> your data leaves your VPC unless the vendor supports bring-your-own-cloud, per-second billing adds up, some impose session limits, and you inherit the vendor's defaults for network and identity.</li>
+</ul>
+
+<div class="table-wrap"><table>
+  <thead><tr><th>Option</th><th>Boundary</th><th>Start time</th><th>Best for</th></tr></thead>
+  <tbody>
+    <tr><td>WASM and language sandboxes</td><td>Runtime</td><td>Instant</td><td>Formulae, formatting, browser-side analysis</td></tr>
+    <tr><td>Hardened containers</td><td>Namespaces, shared kernel</td><td>Sub-second</td><td>Semi-trusted code, inner layer</td></tr>
+    <tr><td>gVisor</td><td>User-space kernel</td><td>Sub-second</td><td>Default for code interpreters and coding agents</td></tr>
+    <tr><td>MicroVMs</td><td>Hardware virtualisation</td><td>Hundreds of milliseconds</td><td>Adversarial and multi-tenant workloads</td></tr>
+    <tr><td>Full VMs</td><td>Hardware virtualisation</td><td>Tens of seconds</td><td>GPU-heavy or regulated workloads</td></tr>
+  </tbody>
+</table></div>
+
+<h2 id="gcp">Doing it on Google Cloud</h2>
+<p><strong>Cloud Run Sandboxes</strong> are the simplest option if you are already on Cloud Run. A <code>sandbox</code> binary ships inside the service; <code>sandbox do -- python3 script.py</code> creates a fresh sandbox, runs the command and tears it down. The CLI can also keep a sandbox alive across a multi-step agent loop.</p>
+<p><strong>GKE Agent Sandbox</strong> adds Kubernetes custom resources (<code>Sandbox</code>, <code>SandboxTemplate</code>, <code>SandboxWarmPool</code>) on top of gVisor. Templates require the gVisor runtime class, a memory limit and dropping all capabilities, and warm pools hand out environments in under a second. There is no extra charge beyond the GKE resources. Pick this when sandboxes need to live next to your other Kubernetes workloads or need GPUs.</p>
+<p><strong>GKE Sandbox without the custom resources</strong> is the same runtime with <code>runtimeClassName: gvisor</code> on a node pool. Simpler if you do not need the lifecycle API.</p>
+<p><strong>Self-managed microVMs</strong> are possible because Compute Engine supports nested virtualisation, but you will be building your own Firecracker or Kata fleet.</p>
+<p><strong>Bring-your-own-cloud vendors</strong> such as Northflank and Beam will deploy their control plane into your Google Cloud project, giving you the SDK experience with data staying in your VPC.</p>
+
+<h2 id="aws">Doing it on AWS</h2>
+<p><strong>Bedrock AgentCore Code Interpreter</strong> is the managed option: Python, JavaScript and TypeScript in Firecracker microVMs with three network modes (Sandbox, Public and VPC). Read the fine print. Security researchers have demonstrated that Sandbox mode still allows DNS queries, which is enough for command-and-control and exfiltration, and that the microVM metadata service exposes the interpreter's IAM execution role. AWS classified both as intended behaviour and updated its documentation to recommend VPC mode for full traffic control. Run it in VPC mode behind an egress firewall with DNS filtering, and give the execution role as close to zero permissions as you can.</p>
+<p><strong>Lambda</strong> is already a Firecracker microVM per invocation. Fifteen-minute cap, no persistent state, no GPU. Good for short, stateless execution.</p>
+<p><strong>Fargate</strong> gives the same microVM isolation with longer-lived tasks and custom images. Put it in a private subnet with no NAT gateway for fully offline execution.</p>
+<p><strong>EC2 with Firecracker or Kata</strong> on <code>.metal</code> instances gives you KVM for a self-managed microVM pool, typically via <code>firecracker-containerd</code> or Kata on EKS. Most control, most work.</p>
+<p><strong>EKS with gVisor</strong> means installing <code>runsc</code> on a node group and using a RuntimeClass. Same trade-offs as GKE Sandbox, except you maintain it.</p>
+<p><strong>E2B, Modal and Vercel Sandbox</strong> all run on AWS. E2B's bring-your-own-cloud option is AWS-only and enterprise-tier.</p>
+
+<h2 id="local">Doing it locally</h2>
+<ul>
+  <li><strong>Docker or Podman, hardened.</strong> A non-root user, tmpfs for <code>/tmp</code>, and the flags below. Rootless Podman adds a second layer.</li>
+</ul>
+<pre><code>docker run --network none --read-only --cap-drop ALL \\
+  --security-opt no-new-privileges --pids-limit 256 \\
+  --memory 2g --cpus 2 --tmpfs /tmp --user 1000:1000 \\
+  your-image python3 script.py</code></pre>
+<ul>
+  <li><strong>gVisor.</strong> Install <code>runsc</code>, register it as a Docker runtime, then <code>docker run --runtime=runsc</code>. Linux only, but the best isolation per unit of effort you will get on a laptop.</li>
+  <li><strong>Firecracker or Kata.</strong> Linux with <code>/dev/kvm</code>; use <code>firecracker-containerd</code>, <code>firectl</code> or Kata with containerd. Ideal for prototyping a warm-pool design that mirrors production.</li>
+  <li><strong>macOS.</strong> No KVM, but Docker Desktop, OrbStack and Colima already run containers inside a Linux VM, so the VM is your boundary. For per-session VMs, use Apple's Virtualization framework via Tart or Lima.</li>
+  <li><strong>Windows.</strong> Windows Sandbox for desktop-agent and GUI use cases; WSL2 plus Docker with gVisor for code execution.</li>
+  <li><strong>Pure WASM.</strong> Pyodide in a browser tab or Wasmtime on the CLI when you want zero infrastructure for Python data work.</li>
+</ul>
+
+<h2 id="non-negotiables">Non-negotiables regardless of layer</h2>
+<p>The AgentCore findings are the pattern to internalise: compute isolation held, network and identity did not.</p>
+<ol>
+  <li><strong>Deny egress by default.</strong> If the agent needs the internet, route it through an allowlisting proxy and filter DNS explicitly, not with string matching.</li>
+  <li><strong>Block metadata endpoints</strong> (<code>169.254.169.254</code> and friends) at the network layer.</li>
+  <li><strong>Give the sandbox no cloud identity if you can.</strong> If it must have one, scope it to the single bucket or table it needs and use short-lived tokens.</li>
+  <li><strong>Mount inputs read-only</strong>, write outputs to a scratch volume you copy out, and destroy the sandbox after every session.</li>
+  <li><strong>Set hard limits</strong> on CPU, memory, PIDs, disk and wall-clock time.</li>
+  <li><strong>Log every tool call</strong> with its arguments, and treat the sandbox as a hostile process in your SIEM.</li>
+</ol>
+
+<h2 id="engineering">Securing agents inside AI engineering</h2>
+<p>Coding agents (Claude Code, Cursor, Copilot's agent mode, Devin-style tools) and the MCP servers that extend them sit in a fundamentally different position from a code interpreter. They run on developer machines or in cloud development environments, they read your entire repository, and they typically hold the developer's own credentials. The sandbox question here is less "can the code escape" and more "what can the agent be talked into doing".</p>
+
+<h3>Treat repository content as untrusted input</h3>
+<p>A README, a code comment, a test fixture, an issue title, a dependency's documentation: anything the agent reads can carry instructions. Attacks that embed hidden text in a pull request description to make a reviewing agent approve it, exfiltrate secrets or run a command are well documented. Assume every file and every fetched page is adversarial, and design so that a successful injection can only do bounded damage.</p>
+
+<h3>Run the agent in its own environment, not your shell</h3>
+<p>Use a devcontainer or a throwaway VM for agent sessions. The agent gets a copy of the repository, a scoped Git credential, and nothing else. Your SSH keys, cloud CLI sessions, browser cookies and <code>~/.aws</code> never enter that environment. Cloud development environments (Codespaces, Gitpod, Coder, GKE Agent Sandbox's computer-use runtime) make this the default. On a laptop, a gVisor-backed devcontainer with network access restricted to your package registries and Git host gets you most of the way.</p>
+
+<h3>Permission the tools, not just the model</h3>
+<p>Agents act through tools: shell, file edit, HTTP fetch, MCP servers. Each tool should have an explicit allowlist and a policy for what needs human confirmation. Read-only operations can auto-run. Anything that writes outside the workspace, sends network traffic, installs packages or touches <code>git push</code> should require approval, at least until you have telemetry showing the agent behaves. Most agent frameworks support this; the mistake is leaving it in "allow all" mode after the first week.</p>
+
+<h3>Audit MCP servers like any other dependency</h3>
+<p>An MCP server is arbitrary code running with whatever credentials you gave it, receiving arbitrary prompts from a model that reads arbitrary content. Before wiring one in: read its source or pin a reviewed version, run it with its own least-privilege credential (not your personal token), keep it network-isolated where possible, and log everything it is asked to do. A community MCP server that "just needs" your full GitHub token is a supply-chain risk, not a productivity tool.</p>
+
+<h3>Give agents their own identity</h3>
+<p>Do not let an agent operate as you. Create non-human identities (a GitHub App, a dedicated service account, a scoped API key) with permissions limited to the repositories and resources the agent needs, short expiry, and clear attribution in audit logs. When something goes wrong, you want to be able to say "the agent did this" rather than "someone with Alice's credentials did this".</p>
+
+<h3>Scan agent-written code harder, not softer</h3>
+<p>Agent-generated code is high volume and plausible-looking, which is the worst combination for review fatigue. Run SAST, secret scanning and dependency checks on every agent commit. Watch specifically for hallucinated package names: models regularly invent plausible dependencies, and attackers register those names on PyPI and npm. Enforce lockfiles and private registry mirrors so a made-up package fails to resolve rather than resolving to malware.</p>
+
+<h2 id="cicd">Securing agents in the CI/CD pipeline</h2>
+<p>CI is where agents are most dangerous, because CI is where secrets, deploy keys and production access are concentrated, and because CI runs on content that outsiders can influence. An agent in a GitHub Actions job that summarises pull requests is one crafted PR title away from being an attacker's shell.</p>
+
+<h3>Never let untrusted content meet privileged tokens</h3>
+<p>The classic "pwn request" pattern predates AI agents: a workflow triggered by <code>pull_request_target</code> or <code>issue_comment</code> runs with a write-capable <code>GITHUB_TOKEN</code> while processing attacker-controlled text. Adding an LLM that reads that text and can call tools makes it dramatically easier to exploit. The rules:</p>
+<ul>
+  <li>Agent jobs that read PR, issue or commit content run with a read-only token and no repository secrets.</li>
+  <li>Any job that holds write access, deploy credentials or cloud OIDC roles never invokes a model on untrusted input.</li>
+  <li>Split the workflow: an unprivileged agent job produces an artifact (a review, a patch, a plan); a separate privileged job, gated on human approval or strict validation, acts on it.</li>
+</ul>
+
+<h3>Short-lived, scoped credentials only</h3>
+<p>Use OIDC federation to your cloud rather than long-lived keys in secrets. Scope the assumed role to the specific job. Set <code>permissions:</code> explicitly at the job level in GitHub Actions, defaulting to <code>contents: read</code> and adding only what is needed. Rotate anything an agent job could conceivably have read.</p>
+
+<h3>Isolate the runners</h3>
+<p>Run agent jobs on ephemeral runners, one job per VM, destroyed afterwards. Self-hosted persistent runners accumulate state and credentials and are a favourite lateral-movement target. If you need self-hosted runners for GPU or network reasons, back them with Firecracker or a fresh VM per job.</p>
+
+<h3>An agent must not be able to merge its own work</h3>
+<p>Branch protection should require review from a human who is not the agent's identity. Required status checks should include SAST, secret scanning and dependency review. Agent-authored PRs get a label and a mandatory reviewer, and CODEOWNERS should route them to someone who understands the affected area. The agent can open, update and comment; it cannot approve or merge.</p>
+
+<h3>Pin everything</h3>
+<p>Pin third-party actions by commit SHA, not by tag. Pin the model version and record it in the workflow so an unannounced model update cannot change behaviour silently. Keep system prompts and tool definitions in the repository under review, not in a dashboard someone edits on a Friday afternoon.</p>
+
+<h3>Restrict egress from CI</h3>
+<p>Agent jobs should reach the model API, your package registries and your Git host, and nothing else. Most CI platforms let you enforce this at the runner network level. Do it there, not in the agent configuration where a prompt injection could disable it.</p>
+
+<h3>Gate on evaluations</h3>
+<p>Treat prompts, tool schemas and agent configurations as code with tests. Maintain a small suite of adversarial cases (injected instructions in a PR body, a malicious package name, a request to print environment variables) and fail the pipeline if the agent takes the bait. This is cheap and catches regressions when a model or prompt changes.</p>
+
+<h3>Budget and kill switch</h3>
+<p>Set a hard cap on tokens, tool calls and wall-clock time per job. An agent stuck in a loop, or one being driven by an attacker, should hit a limit before it hits your bill or your database. Have a single feature flag that disables all agent jobs organisation-wide, and rehearse using it.</p>
+
+<h3>Log tool calls, not just outcomes</h3>
+<p>A green tick tells you nothing about what the agent did to get there. Record every tool invocation with arguments and results, ship it to the same place as your other audit logs, and alert on anything touching secrets, network calls outside the allowlist, or writes outside the workspace.</p>
+
+<h2 id="checklist">A checklist you can paste into a ticket</h2>
+<h3>Compute isolation</h3>
+<ul class="checklist">
+  <li>{CHECK}<span>AI-generated code runs in gVisor or a microVM, never directly on the host</span></li>
+  <li>{CHECK}<span>Sandboxes are ephemeral and destroyed after each session</span></li>
+  <li>{CHECK}<span>Hard limits on CPU, memory, PIDs, disk and time</span></li>
+</ul>
+<h3>Network</h3>
+<ul class="checklist">
+  <li>{CHECK}<span>Egress denied by default, with an allowlisting proxy for exceptions</span></li>
+  <li>{CHECK}<span>DNS filtered and metadata endpoints blocked at the network layer</span></li>
+</ul>
+<h3>Identity</h3>
+<ul class="checklist">
+  <li>{CHECK}<span>Agents have their own non-human identities with least privilege</span></li>
+  <li>{CHECK}<span>Sandboxes hold no cloud credentials, or only short-lived, single-purpose ones</span></li>
+  <li>{CHECK}<span>Developers' personal credentials never enter the agent environment</span></li>
+</ul>
+<h3>Engineering workflow</h3>
+<ul class="checklist">
+  <li>{CHECK}<span>Coding agents run in devcontainers or throwaway VMs</span></li>
+  <li>{CHECK}<span>Tool allowlists with human confirmation for writes, network, installs and push</span></li>
+  <li>{CHECK}<span>MCP servers reviewed, pinned and given their own scoped credentials</span></li>
+  <li>{CHECK}<span>Lockfiles and private registry mirrors enforced; SAST and secret scanning on agent commits</span></li>
+</ul>
+<h3>CI/CD</h3>
+<ul class="checklist">
+  <li>{CHECK}<span>Agent jobs on untrusted input run with read-only tokens and no secrets</span></li>
+  <li>{CHECK}<span>Privileged jobs never invoke a model on untrusted input</span></li>
+  <li>{CHECK}<span>Ephemeral runners, one job per VM</span></li>
+  <li>{CHECK}<span>Agents cannot approve or merge their own PRs; a human reviewer is required</span></li>
+  <li>{CHECK}<span>Actions pinned by SHA, model version pinned, prompts under version control</span></li>
+  <li>{CHECK}<span>CI egress restricted; an adversarial evaluation suite gates the pipeline</span></li>
+  <li>{CHECK}<span>Token, tool-call and time budgets per job; organisation-wide kill switch tested</span></li>
+  <li>{CHECK}<span>Every tool call logged and alertable</span></li>
+</ul>
+
+<h2 id="closing">Closing thought</h2>
+<p>The sandbox is the easy part. gVisor and Firecracker are mature, the cloud providers now ship purpose-built agent runtimes, and a hardened container on a laptop is ten minutes of work. What separates teams that get burned from teams that don't is the discipline around what the agent can reach: which credentials, which networks, which parts of the pipeline. Start by assuming every agent will eventually be tricked into doing something you did not intend, and build so that when it happens, the blast radius is a scratch volume and a log entry.</p>
+<p>If you are deciding where to start: sandbox the code interpreter this week, split your CI agent jobs from your privileged jobs next week, and get agents onto their own identities the week after. Everything else compounds from there.</p>
+
+<h2 id="orbit3">Where Orbit3 fits</h2>
+<p>We build and run <a href="/Services/ai-solutions/">AI agents and LLM applications</a> for clients, and the isolation, identity and pipeline controls above are how we build them. If you already have agents in your engineering workflow, our <a href="/Services/cloud-security/">cloud security</a> team will review where they run, what they can reach and how they are permissioned, and hand you a prioritised fix list. Where the gaps are in the pipeline itself, our <a href="/Services/cloud-devops/">cloud DevOps</a> service puts the runner isolation, OIDC credentials and egress controls in place.</p>
+<p>If you are not sure how exposed your agents are today, <a href="/contact/">get in touch</a>. A free 30-minute call is usually enough to tell you whether the risk is in the sandbox, the network or the credentials, and what to fix first.</p>
+'''.replace("{CHECK}", I["check"])
+
+SANDBOX_POST = {
+  "slug": "sandboxing-ai-workloads",
+  "title": "Sandboxing AI Workloads and Securing Agents Across the Engineering Pipeline",
+  "seo_title": "Sandboxing AI Workloads: Isolating AI Agents on GCP, AWS and Locally | Orbit3",
+  "desc": "A practical guide to sandboxing AI workloads: gVisor, microVMs and managed sandboxes on Google Cloud, AWS and your laptop, plus how to secure coding agents and CI/CD pipelines.",
+  "category": "AI Security",
+  "date": "2026-09-03", "updated": "2026-09-03",
+  "summary": "Containers aren't enough. The isolation ladder from WASM to microVMs, how to stand it up on Google Cloud, AWS and your own machine, and how to keep coding agents and CI/CD pipelines contained when they hold the keys to everything.",
+  "keywords": ["AI sandboxing", "AI agent security", "gVisor", "Firecracker", "prompt injection", "MCP security", "CI/CD security", "GKE Agent Sandbox", "Bedrock AgentCore", "Cloud Run Sandboxes"],
+  "body": SANDBOX_BODY,
+  "faqs": [
+   ("Is a Docker container enough to sandbox AI-generated code?", "Not on its own. A container shares the host kernel, so a kernel exploit is a full escape. Hardened containers are a good inner layer, but for code an agent wrote you want gVisor or a microVM such as Firecracker as the boundary, with egress denied by default and no cloud credentials inside."),
+   ("What is the difference between gVisor and Firecracker?", "gVisor is a user-space kernel that intercepts syscalls so the host kernel sees a tiny surface. It is a drop-in container runtime with sub-second starts. Firecracker is a microVM: a hardware-virtualised boundary with its own kernel, boot times in the low hundreds of milliseconds, and snapshot support for warm pools. gVisor is the easier default; Firecracker is the stronger boundary for adversarial or multi-tenant workloads."),
+   ("Does sandboxing stop prompt injection?", "No. Prompt injection makes the model follow instructions embedded in content it reads, and the model is behaving as designed. Compute isolation does not help. The controls are egress restriction, tool permissioning with human confirmation for risky actions, least-privilege identities, and human review before anything irreversible."),
+   ("How should coding agents like Claude Code or Cursor be run safely?", "In their own environment, not your shell: a devcontainer or throwaway VM with a copy of the repository, a scoped Git credential and nothing else. Give the agent its own non-human identity, allowlist its tools with confirmation for writes, network calls, installs and pushes, and audit any MCP servers as you would any other dependency."),
+   ("What is the biggest risk of running an AI agent in CI/CD?", "Untrusted content meeting privileged tokens. A workflow that lets a model read pull request or issue text while holding a write-capable token or deploy credentials can be driven by anyone who can open a PR. Split the workflow so unprivileged agent jobs produce an artifact and a separate, gated privileged job acts on it, and run agent jobs on ephemeral runners with restricted egress."),
+  ],
+  "related": ["ai-solutions", "cloud-security", "cloud-devops"],
+  "cta": ("Get started", "Running agents that can execute code?", "Book a free 30-minute call. We'll look at where your agents run, what they can reach and what they hold, and tell you what to fix first.", "Book a free AI security call"),
+}
+
 POSTS = [
+ SANDBOX_POST,
  {
   "slug": "soc-2-remediation-guide",
   "title": "SOC 2 Remediation: How to Close the Gaps Vanta Finds",
@@ -1425,6 +1666,7 @@ POSTS = [
    ("What evidence does Vanta not collect automatically?", "Anything that does not live in an integrated system: incident records, meeting minutes for risk reviews, restore test results, signed vendor assessments and some HR documents. Keep a folder for these from the start of remediation."),
   ],
   "related": ["soc2-compliance", "cloud-security", "cloudops-managed-services"],
+  "cta": ("Get started", "Staring at a red Vanta dashboard?", "Book a free 30-minute call. Share your screen and we'll tell you which failing tests matter, which are quick, and how long a realistic remediation would take.", "Book a free SOC 2 triage call"),
  },
 ]
 
@@ -1474,7 +1716,7 @@ def post_page(post):
     <div class="grid grid-3">{rel_cards}</div>
   </div>
 </section>
-{cta_band("Get started", "Staring at a red Vanta dashboard?", "Book a free 30-minute call. Share your screen and we'll tell you which failing tests matter, which are quick, and how long a realistic remediation would take.", "Book a free SOC 2 triage call")}
+{cta_band(*post["cta"])}
 '''
     html_out = head(path, post["seo_title"], post["desc"], [ORG, article, crumb_ld, faq_ld]) + header(path) + body + footer()
     html_out = html_out.replace('<meta property="og:type" content="website">', '<meta property="og:type" content="article">\n<meta property="article:published_time" content="' + post["date"] + '">\n<meta property="article:modified_time" content="' + post["updated"] + '">\n<meta property="article:author" content="' + SITE + '/about/">')

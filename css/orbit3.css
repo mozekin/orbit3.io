@@ -451,3 +451,9 @@ a:focus-visible, button:focus-visible, summary:focus-visible, .nav-burger:focus-
 .post-list { display: grid; gap: 20px; }
 .post-kicker { display: flex; flex-wrap: wrap; gap: 6px 14px; font-family: var(--font-head); font-size: 0.76rem; letter-spacing: 0.12em; text-transform: uppercase; color: var(--fg-faint); margin-bottom: 12px; }
 .post-kicker .cat { color: var(--accent); }
+.prose code { font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; font-size: 0.88em; background: var(--surface-2); border: 1px solid var(--border); border-radius: 6px; padding: 0.1em 0.4em; color: var(--fg); white-space: nowrap; }
+.prose pre { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 16px 20px; margin: 1.2rem 0 1.6rem; overflow-x: auto; font-size: 0.9rem; line-height: 1.6; }
+.prose pre code { background: none; border: 0; padding: 0; white-space: pre; font-size: inherit; }
+.prose .checklist { margin: 0.6rem 0 1.6rem; gap: 10px; }
+.prose .checklist li { font-size: 1rem; }
+.prose .checklist svg { width: 20px; height: 20px; }
