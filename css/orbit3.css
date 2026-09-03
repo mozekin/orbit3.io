@@ -425,6 +425,7 @@ a:focus-visible, button:focus-visible, summary:focus-visible, .nav-burger:focus-
 .post-meta { display: flex; flex-wrap: wrap; justify-content: center; gap: 8px 18px; margin-top: 20px; font-size: 0.9rem; color: var(--fg-faint); }
 .post-meta a { color: var(--fg-muted); }
 .post-meta a:hover { color: var(--accent); }
+.post-meta .sep, .post-kicker .sep { opacity: 0.6; }
 .toc { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 20px 24px; margin: 0 0 44px; }
 .toc-title { font-family: var(--font-head); font-size: 0.76rem; letter-spacing: 0.14em; text-transform: uppercase; color: var(--fg-faint); margin-bottom: 10px; }
 .toc ol { margin: 0; padding-left: 20px; display: grid; gap: 6px; color: var(--fg-muted); font-size: 0.97rem; }
