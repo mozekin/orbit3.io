@@ -1,0 +1,20 @@
+# Secrets and tokens - never commit
+.env
+credentials.json
+token.json
+*.pem
+
+# Generated audio and caches
+*.mp3
+*.wav
+audio/
+.jarvis-cache/
+
+# Python
+__pycache__/
+*.pyc
+.pytest_cache/
+*.egg-info/
+build/
+dist/
+.venv/

@@ -1,0 +1,130 @@
+[
+  {
+    "id": "av-001",
+    "from": "Auravest Support <support@auravest.ai>",
+    "to": "martin@orbit3.io",
+    "subject": "[Auravest] New signup: Priya Raman (priya@northwindcapital.com.au)",
+    "age_hours": 2.5,
+    "labels": ["INBOX", "UNREAD"],
+    "body": "A new user has signed up to Auravest.\n\nName: Priya Raman\nEmail: priya@northwindcapital.com.au\nCompany: Northwind Capital\nPlan: Professional\nSigned up: 2026-09-05 06:41 AEST\nSource: Organic search\n\n-- Auravest Operations"
+  },
+  {
+    "id": "av-002",
+    "from": "support@auravest.ai",
+    "to": "martin@orbit3.io",
+    "subject": "Auravest signup notification",
+    "age_hours": 7,
+    "labels": ["INBOX", "UNREAD"],
+    "body": "Operational notification - new account created.\n\n{\"event\": \"user.signup\", \"user\": {\"full_name\": \"Tom Halloran\", \"email\": \"tom.halloran@gmail.com\"}, \"plan\": \"Starter\", \"company\": \"\", \"created_at\": \"2026-09-05T01:12:09+10:00\"}\n\nThis is an automated message."
+  },
+  {
+    "id": "av-003",
+    "from": "Auravest <support@auravest.ai>",
+    "to": "martin@orbit3.io",
+    "subject": "New Auravest account registered",
+    "age_hours": 16,
+    "labels": ["INBOX"],
+    "html": "<html><body><h2>New account</h2><table><tr><td>Name</td><td>Dr. Elena Vasquez</td></tr><tr><td>Email</td><td>e.vasquez@sydneyhealthgroup.org</td></tr><tr><td>Organisation</td><td>Sydney Health Group</td></tr><tr><td>Plan</td><td>Enterprise Trial</td></tr></table><p>Have a wonderful day.</p></body></html>"
+  },
+  {
+    "id": "av-004",
+    "from": "support@auravest.ai",
+    "to": "martin@orbit3.io",
+    "subject": "Auravest weekly usage report",
+    "age_hours": 20,
+    "labels": ["INBOX"],
+    "body": "Weekly usage summary for Auravest.\nActive users: 412\nAPI calls: 1,203,442\nNo action required."
+  },
+  {
+    "id": "av-005",
+    "from": "support@auravest.ai",
+    "to": "martin@orbit3.io",
+    "subject": "[Auravest] New signup: Sam Whitcombe",
+    "age_hours": 70,
+    "labels": ["INBOX"],
+    "body": "Name: Sam Whitcombe\nEmail: sam@whitcombe.dev\nPlan: Starter"
+  },
+  {
+    "id": "o3-101",
+    "from": "Rachel Nguyen <rachel.nguyen@harbourlinelogistics.com.au>",
+    "to": "Martin Ozekin <martin@orbit3.io>",
+    "subject": "URGENT: Production outage on the AWS landing zone",
+    "age_hours": 1.2,
+    "labels": ["INBOX", "UNREAD", "IMPORTANT"],
+    "headers": {"Importance": "high"},
+    "body": "Martin,\n\nOur production VPC lost connectivity at 07:10 this morning and the on-call team cannot reach the Transit Gateway. We need someone from Orbit3 on a call immediately.\n\nPlease call me on 0412 555 019 as soon as you see this.\n\nRachel"
+  },
+  {
+    "id": "o3-102",
+    "from": "James Okafor <james@vanta.com>",
+    "to": "martin@orbit3.io",
+    "subject": "SOC 2 Type II evidence request - due Friday",
+    "age_hours": 5,
+    "labels": ["INBOX", "UNREAD"],
+    "body": "Hi Martin,\n\nAhead of the audit window, could you upload the following evidence to Vanta by Friday:\n\n- [ ] Access review sign-off for Q3\n- [ ] Updated vendor risk register\n- [ ] Screenshot of MFA enforcement in Google Workspace\n\nThanks,\nJames"
+  },
+  {
+    "id": "o3-103",
+    "from": "Aisha Patel <aisha.patel@lumenretail.com>",
+    "to": "martin@orbit3.io",
+    "subject": "Re: Cloud cost optimisation proposal",
+    "age_hours": 9,
+    "labels": ["INBOX"],
+    "body": "Thanks Martin. The board liked the numbers.\n\nCan you send over the revised statement of work by COB Wednesday? We'd also like a 30 minute walkthrough of the reserved instance plan next week.\n\nAisha"
+  },
+  {
+    "id": "o3-104",
+    "from": "Cloudflare <noreply@notify.cloudflare.com>",
+    "to": "martin@orbit3.io",
+    "subject": "Your weekly Cloudflare analytics digest",
+    "age_hours": 12,
+    "labels": ["INBOX", "CATEGORY_UPDATES"],
+    "headers": {"List-Unsubscribe": "<https://notify.cloudflare.com/unsub>"},
+    "body": "Here is your weekly summary. Requests: 1.2M. Threats blocked: 3,405. Please review your dashboard for more."
+  },
+  {
+    "id": "o3-105",
+    "from": "Calendly <notifications@calendly.com>",
+    "to": "martin@orbit3.io",
+    "subject": "New Event: Introductory Call with Ben Marsh",
+    "age_hours": 14,
+    "labels": ["INBOX"],
+    "body": "A new event has been scheduled.\nEvent: Introductory Call\nInvitee: Ben Marsh (ben@marshventures.co)\nWhen: Monday 08 Sep 2026, 10:00am AEST"
+  },
+  {
+    "id": "o3-106",
+    "from": "Datadog Monitoring <alert@dtdg.co>",
+    "to": "martin@orbit3.io",
+    "subject": "[P1] Critical: Disk usage above 95% on prod-db-01",
+    "age_hours": 3,
+    "labels": ["INBOX", "UNREAD"],
+    "body": "Monitor triggered: disk.used_pct > 95 on prod-db-01 (client: Harbourline). Immediate action required to avoid database halt."
+  },
+  {
+    "id": "o3-107",
+    "from": "Lucy Bennett <lucy@orbit3.io>",
+    "to": "martin@orbit3.io",
+    "subject": "Insights article draft + invoice reminder",
+    "age_hours": 26,
+    "labels": ["INBOX"],
+    "body": "Hi Martin,\n\nTwo things:\n1. Could you review the draft of the 'Sandboxing AI workloads' follow-up article before Thursday?\n2. Reminder: the Lumen Retail invoice is overdue by 12 days - please chase.\n\nAlso, no rush, but the office plant needs watering at some point.\n\nLucy"
+  },
+  {
+    "id": "o3-108",
+    "from": "Martin Ozekin <martin@orbit3.io>",
+    "to": "rachel.nguyen@harbourlinelogistics.com.au",
+    "subject": "Re: Transit Gateway routing",
+    "age_hours": 30,
+    "labels": ["SENT"],
+    "body": "Rachel, routing table attached. Let me know if the peering comes up."
+  },
+  {
+    "id": "o3-109",
+    "from": "Old News <news@example.com>",
+    "to": "martin@orbit3.io",
+    "subject": "TODO: renew domain",
+    "age_hours": 200,
+    "labels": ["INBOX"],
+    "body": "Please renew the orbit3.io domain before it lapses."
+  }
+]

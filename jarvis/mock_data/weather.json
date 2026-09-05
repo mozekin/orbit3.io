@@ -1,0 +1,28 @@
+{
+  "latitude": -33.875,
+  "longitude": 151.25,
+  "timezone": "Australia/Sydney",
+  "timezone_abbreviation": "AEST",
+  "current_units": {"temperature_2m": "°C", "wind_speed_10m": "km/h"},
+  "current": {
+    "time": "2026-09-05T08:15",
+    "interval": 900,
+    "temperature_2m": 17.4,
+    "apparent_temperature": 15.9,
+    "relative_humidity_2m": 68,
+    "weather_code": 2,
+    "wind_speed_10m": 14.2,
+    "is_day": 1
+  },
+  "daily_units": {"temperature_2m_max": "°C", "precipitation_sum": "mm"},
+  "daily": {
+    "time": ["2026-09-05", "2026-09-06", "2026-09-07"],
+    "weather_code": [2, 61, 3],
+    "temperature_2m_max": [21.3, 18.7, 20.1],
+    "temperature_2m_min": [11.8, 13.2, 12.4],
+    "precipitation_probability_max": [10, 72, 35],
+    "precipitation_sum": [0.0, 8.4, 0.6],
+    "wind_speed_10m_max": [22.0, 31.5, 19.8],
+    "uv_index_max": [5.2, 2.1, 4.8]
+  }
+}
