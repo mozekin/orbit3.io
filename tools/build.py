@@ -296,7 +296,7 @@ BLURB = {
 }
 
 # ---------------------------------------------------------------- service page builder
-def service_page(slug, title, desc, h1, lede, eyebrow, h2, intro_paras, bullets, panel, who, included, how_h2, how_steps, platforms, faqs, rel, cta, service_type, extra_sections=""):
+def service_page(slug, title, desc, h1, lede, eyebrow, h2, intro_paras, bullets, panel, who, included, how_h2, how_steps, platforms, faqs, rel, cta, service_type, extra_sections="", hero_bg="", hero_extra=""):
     path = SURL[slug]
     crumb_ld, crumb_html = crumbs([("Home", "/"), ("Services", "/Services/"), (SNAME[slug], None)])
     faq_ld, faq_html = faq_section(faqs)
@@ -304,17 +304,19 @@ def service_page(slug, title, desc, h1, lede, eyebrow, h2, intro_paras, bullets,
               "description": desc, "url": SITE + path, "provider": {"@id": f"{SITE}/#organization"},
               "areaServed": {"@type": "Place", "name": "Worldwide"},
               "offers": {"@type": "Offer", "url": CAL, "description": "Free 30-minute introductory call"}}
+    hero_bg = hero_bg and "\n  " + hero_bg
+    hero_extra = hero_extra and "\n    " + hero_extra
     paras = "".join(f"<p>{p}</p>" for p in intro_paras)
     inc = "".join(f'<li>{I["check"]}<span><strong>{t}</strong>{d}</span></li>' for t, d in included)
     plat = "".join(f'<div class="card reveal"><h3>{h}</h3><p>{p}</p></div>' for h, p in platforms)
     body = f'''<section class="page-hero center">
   <div class="aurora" aria-hidden="true"><span class="blob"></span></div>
-  <div class="hero-grid-overlay" aria-hidden="true"></div>
+  <div class="hero-grid-overlay" aria-hidden="true"></div>{hero_bg}
   <div class="container">
     {crumb_html}
     <h1 class="measure">{h1}</h1>
     <p class="lede measure">{lede}</p>
-    {cta_buttons()}
+    {cta_buttons()}{hero_extra}
   </div>
 </section>
 <section class="section">
@@ -533,6 +535,48 @@ service_page(
 )
 
 # ---------- AI Solutions
+# Scripted hero demo (js/ai3d.js): a training run, then a cloud ops copilot answering plain-English questions.
+AI_TRAIN = [
+ ("cmd", "orbit3 train --base llama-3.1-8b --lora ./ops-data"),
+ ("dim slow", "loaded 18,432 incidents, runbooks and bills"),
+ ("ep", "epoch 1/4  loss 2.184  eval 61.3%"),
+ ("ep", "epoch 2/4  loss 0.947  eval 78.9%"),
+ ("ep", "epoch 3/4  loss 0.412  eval 88.6%"),
+ ("ep", "epoch 4/4  loss 0.236  eval 93.1%"),
+ ("ok", "✓ ops-copilot deployed · eu-west-2"),
+]
+AI_DEMO = [
+ {"q": "Why did our AWS bill jump last week?",
+  "a": "Spend rose 23% (£4,180) week on week. Most of it came from six m6i.4xlarge nodes the EKS autoscaler added on Tuesday that never scaled back in. Capping the node group at 8 and adding a scale-down policy saves about £2,950 a month. Shall I raise the pull request?"},
+ {"q": "Is anything in production publicly exposed?",
+  "a": "Two findings. The S3 bucket invoices-export allows public read and was created three days ago, and security group sg-legacy-admin opens port 22 to the whole internet. Both are managed in Terraform, so I've drafted the fixes as a plan for your review."},
+ {"q": "Did last night's backups all succeed?",
+  "a": "41 of 42 jobs succeeded. The orders-db snapshot failed at 02:14 with a KMS access error caused by yesterday's key rotation. I've prepared an updated key policy and a retry. Approve it and the backup runs straight away, with a restore test afterwards."},
+]
+
+def ai_lab():
+    log = "".join(
+        f'<div class="cmd"><span class="p">$</span> <span class="t">{html.escape(t)}</span></div>' if c == "cmd"
+        else f'<div class="{c}">{html.escape(t)}</div>' for c, t in AI_TRAIN)
+    first = AI_DEMO[0]
+    data = json.dumps(AI_DEMO, ensure_ascii=False).replace("</", "<\\/")
+    return f'''<div class="ai-lab" aria-hidden="true">
+      <div class="hero-term ai-train">
+        <div class="hero-term-bar"><span></span><span></span><span></span><em>training · ops-copilot</em></div>
+        <div class="hero-term-body">{log}</div>
+        <svg class="ai-loss" viewBox="0 0 300 56" preserveAspectRatio="none"><path pathLength="100" d="M0,5 C50,8 70,34 130,42 S240,51 300,52"/></svg>
+      </div>
+      <div class="hero-term ai-chat">
+        <div class="hero-term-bar"><span></span><span></span><span></span><em>ops-copilot · illustrative demo</em></div>
+        <div class="ai-chat-body">
+          <div class="ai-msg ai-msg--user"><span class="ai-q">{html.escape(first["q"])}</span></div>
+          <div class="ai-msg ai-msg--bot"><span class="ai-who">ops-copilot</span><span class="ai-a">{html.escape(first["a"])}</span></div>
+        </div>
+      </div>
+    </div>
+    <script type="application/json" id="aiDemo">{data}</script>
+    <script type="module" src="/js/ai3d.js"></script>'''
+
 service_page(
  slug="ai-solutions",
  title="AI Consulting & LLM Implementation Services | Orbit3",
@@ -600,6 +644,8 @@ service_page(
  rel=["cloudops-managed-services", "cloud-security", "cloud-devops"],
  cta={"eyebrow": "Get started", "h2": "Have an AI idea? Let's pressure-test it.", "p": "Book a free 30-minute scoping call. We'll tell you whether AI is the right tool, where it pays off first, and what it would take to ship.", "btn": "Book a free scoping call"},
  service_type="AI consulting and implementation",
+ hero_bg='<div class="hero-3d" aria-hidden="true"></div>',
+ hero_extra=ai_lab(),
 )
 
 # ---------- Cloud Adoption
@@ -1068,6 +1114,7 @@ def home():
     body = f'''<section class="hero center">
   <div class="aurora" aria-hidden="true"><span class="blob"></span></div>
   <div class="hero-grid-overlay" aria-hidden="true"></div>
+  <div class="hero-3d" aria-hidden="true"></div>
   <div class="container">
     <span class="eyebrow eyebrow--center">Managed Cloud Services &amp; AI Consulting</span>
     <h1>Your technology, <span class="text-gradient">fully managed.</span><br>Your AI, finally shipped.</h1>
@@ -1077,8 +1124,23 @@ def home():
       <a class="btn btn-ghost btn-lg" href="/Services/">See what we do {I["arrow"]}</a>
     </div>
     <div class="hero-trust">Free 30-minute call · No obligation · We reply within one business day</div>
+    <div class="hero-term" aria-hidden="true">
+      <div class="hero-term-bar"><span></span><span></span><span></span><em>orbit3 — terraform — prod</em></div>
+      <div class="hero-term-body">
+        <div class="cmd"><span class="p">$</span> <span class="t">terraform plan -out=prod.tfplan</span></div>
+        <div class="slow dim">Refreshing state... [module.network.aws_vpc.main]</div>
+        <div class="add">  + module.eks.aws_eks_node_group.workers</div>
+        <div class="chg">  ~ module.backup.aws_backup_plan.daily</div>
+        <div>Plan: <b>4</b> to add, <b>1</b> to change, <b>0</b> to destroy.</div>
+        <div class="cmd"><span class="p">$</span> <span class="t">terraform apply prod.tfplan</span></div>
+        <div class="slow dim">module.eks.aws_eks_node_group.workers: Creating...</div>
+        <div class="dim">module.eks.aws_eks_node_group.workers: Creation complete after 2m41s</div>
+        <div class="ok">Apply complete! Resources: 4 added, 1 changed, 0 destroyed.</div>
+      </div>
+    </div>
   </div>
 </section>
+<script type="module" src="/js/hero3d.js"></script>
 <section class="section--tight">
   <div class="container center">
     <p class="eyebrow eyebrow--center" style="color:var(--fg-faint)">Built on the platforms you already trust</p>

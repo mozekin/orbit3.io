@@ -29,7 +29,7 @@
 <link rel="apple-touch-icon" href="/images/apple-touch-icon.png" sizes="180x180">
 <link rel="preload" href="/fonts/dm-sans-variable.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="preload" href="/fonts/space-grotesk-variable.woff2" as="font" type="font/woff2" crossorigin>
-<link href="/css/orbit3.css?v=dc1a012e" rel="stylesheet">
+<link href="/css/orbit3.css?v=09c1efba" rel="stylesheet">
 <script>document.documentElement.classList.add('js');</script>
 <script type="application/ld+json">{"@context": "https://schema.org", "@graph": [{"@type": "Organization", "@id": "https://orbit3.io/#organization", "name": "Orbit3", "url": "https://orbit3.io/", "logo": {"@type": "ImageObject", "url": "https://orbit3.io/images/logo.png", "width": 759, "height": 258}, "image": "https://orbit3.io/images/og-image.png", "description": "Orbit3 is a managed cloud services and AI consultancy. We run cloud and IT operations for growing businesses and build custom AI and automation on top of them.", "email": "hello@orbit3.io", "sameAs": ["https://linkedin.com/company/orbit3"], "founder": {"@type": "Person", "name": "Martin", "jobTitle": "Founder", "url": "https://orbit3.io/about/"}, "knowsAbout": ["Managed cloud services", "CloudOps", "FinOps", "Cloud security", "SOC 2 compliance", "SOC 2 remediation", "Vanta", "DevOps", "Cloud migration", "Backup and disaster recovery", "AI consulting", "LLM implementation", "Workflow automation", "Amazon Web Services", "Microsoft Azure", "Google Cloud"], "contactPoint": {"@type": "ContactPoint", "contactType": "sales", "email": "hello@orbit3.io", "url": "https://calendly.com/martin-orbit3/introductory-call", "availableLanguage": "English"}}, {"@type": "WebSite", "@id": "https://orbit3.io/#website", "url": "https://orbit3.io/", "name": "Orbit3", "publisher": {"@id": "https://orbit3.io/#organization"}}]}</script>
 <!-- Google tag (gtag.js) with Consent Mode v2: analytics cookies stay off until the visitor accepts -->
@@ -74,6 +74,7 @@ gtag('js',new Date());gtag('config','G-YT6G7B299N');</script>
 <main id="main"><section class="hero center">
   <div class="aurora" aria-hidden="true"><span class="blob"></span></div>
   <div class="hero-grid-overlay" aria-hidden="true"></div>
+  <div class="hero-3d" aria-hidden="true"></div>
   <div class="container">
     <span class="eyebrow eyebrow--center">Managed Cloud Services &amp; AI Consulting</span>
     <h1>Your technology, <span class="text-gradient">fully managed.</span><br>Your AI, finally shipped.</h1>
@@ -83,8 +84,23 @@ gtag('js',new Date());gtag('config','G-YT6G7B299N');</script>
       <a class="btn btn-ghost btn-lg" href="/Services/">See what we do <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg></a>
     </div>
     <div class="hero-trust">Free 30-minute call · No obligation · We reply within one business day</div>
+    <div class="hero-term" aria-hidden="true">
+      <div class="hero-term-bar"><span></span><span></span><span></span><em>orbit3 — terraform — prod</em></div>
+      <div class="hero-term-body">
+        <div class="cmd"><span class="p">$</span> <span class="t">terraform plan -out=prod.tfplan</span></div>
+        <div class="slow dim">Refreshing state... [module.network.aws_vpc.main]</div>
+        <div class="add">  + module.eks.aws_eks_node_group.workers</div>
+        <div class="chg">  ~ module.backup.aws_backup_plan.daily</div>
+        <div>Plan: <b>4</b> to add, <b>1</b> to change, <b>0</b> to destroy.</div>
+        <div class="cmd"><span class="p">$</span> <span class="t">terraform apply prod.tfplan</span></div>
+        <div class="slow dim">module.eks.aws_eks_node_group.workers: Creating...</div>
+        <div class="dim">module.eks.aws_eks_node_group.workers: Creation complete after 2m41s</div>
+        <div class="ok">Apply complete! Resources: 4 added, 1 changed, 0 destroyed.</div>
+      </div>
+    </div>
   </div>
 </section>
+<script type="module" src="/js/hero3d.js"></script>
 <section class="section--tight">
   <div class="container center">
     <p class="eyebrow eyebrow--center" style="color:var(--fg-faint)">Built on the platforms you already trust</p>
