@@ -243,8 +243,8 @@ strong { color: var(--fg); font-weight: 600; }
 .ai-lab .hero-term { max-width: none; margin: 0; display: flex; flex-direction: column; }
 .ai-train .hero-term-body { padding-bottom: 6px; }
 .hero-term .ep { color: var(--fg); }
-.ai-loss { display: block; width: calc(100% - 36px); height: 56px; margin: 0 18px 14px; overflow: visible; }
-.ai-loss path { fill: none; stroke: var(--accent); stroke-width: 2; vector-effect: non-scaling-stroke; stroke-dasharray: 100; stroke-dashoffset: 0; transition: stroke-dashoffset 1.2s var(--ease); }
+.ai-loss { display: block; width: calc(100% - 36px); height: auto; margin: 0 18px 14px; overflow: visible; }
+.ai-loss path { fill: none; stroke: var(--accent); stroke-width: 1.5; stroke-dasharray: 100 101; stroke-dashoffset: 0; transition: stroke-dashoffset 1.2s var(--ease); }
 .ai-lab.is-typing .ai-loss path { stroke-dashoffset: 100; }
 .ai-chat-body { height: 16rem; overflow: hidden; padding: 16px 18px; display: flex; flex-direction: column; gap: 12px; font-family: var(--font-body); font-size: 0.88rem; line-height: 1.55; }
 .ai-msg { max-width: 92%; }

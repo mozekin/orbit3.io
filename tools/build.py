@@ -564,7 +564,7 @@ def ai_lab():
       <div class="hero-term ai-train">
         <div class="hero-term-bar"><span></span><span></span><span></span><em>training · ops-copilot</em></div>
         <div class="hero-term-body">{log}</div>
-        <svg class="ai-loss" viewBox="0 0 300 56" preserveAspectRatio="none"><path pathLength="100" d="M0,5 C50,8 70,34 130,42 S240,51 300,52"/></svg>
+        <svg class="ai-loss" viewBox="0 0 300 56"><path pathLength="100" d="M0,5 C50,8 70,34 130,42 S240,51 300,52"/></svg>
       </div>
       <div class="hero-term ai-chat">
         <div class="hero-term-bar"><span></span><span></span><span></span><em>ops-copilot · illustrative demo</em></div>
