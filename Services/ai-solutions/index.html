@@ -32,10 +32,10 @@
 <link href="/css/orbit3.css?v=6360739e" rel="stylesheet">
 <script>document.documentElement.classList.add('js');</script>
 <script type="application/ld+json">{"@context": "https://schema.org", "@graph": [{"@type": "Organization", "@id": "https://orbit3.io/#organization", "name": "Orbit3", "url": "https://orbit3.io/", "logo": {"@type": "ImageObject", "url": "https://orbit3.io/images/logo.png", "width": 759, "height": 258}, "image": "https://orbit3.io/images/og-image.png", "description": "Orbit3 is a managed cloud services and AI consultancy. We run cloud and IT operations for growing businesses and build custom AI and automation on top of them.", "email": "hello@orbit3.io", "sameAs": ["https://linkedin.com/company/orbit3"], "founder": {"@type": "Person", "name": "Martin", "jobTitle": "Founder", "url": "https://orbit3.io/about/"}, "knowsAbout": ["Managed cloud services", "CloudOps", "FinOps", "Cloud security", "SOC 2 compliance", "SOC 2 remediation", "Vanta", "DevOps", "Cloud migration", "Backup and disaster recovery", "AI consulting", "LLM implementation", "Workflow automation", "Amazon Web Services", "Microsoft Azure", "Google Cloud"], "contactPoint": {"@type": "ContactPoint", "contactType": "sales", "email": "hello@orbit3.io", "url": "https://calendly.com/martin-orbit3/introductory-call", "availableLanguage": "English"}}, {"@type": "Service", "@id": "https://orbit3.io/Services/ai-solutions/#service", "name": "AI Solutions", "serviceType": "AI consulting and implementation", "description": "AI consulting and implementation from Orbit3: custom LLM applications, RAG, workflow automation and AI agents, built on secure foundations and run for you.", "url": "https://orbit3.io/Services/ai-solutions/", "provider": {"@id": "https://orbit3.io/#organization"}, "areaServed": {"@type": "Place", "name": "Worldwide"}, "offers": {"@type": "Offer", "url": "https://calendly.com/martin-orbit3/introductory-call", "description": "Free 30-minute introductory call"}}, {"@type": "BreadcrumbList", "itemListElement": [{"@type": "ListItem", "position": 1, "name": "Home", "item": "https://orbit3.io/"}, {"@type": "ListItem", "position": 2, "name": "Services", "item": "https://orbit3.io/Services/"}, {"@type": "ListItem", "position": 3, "name": "AI Solutions"}]}, {"@type": "FAQPage", "mainEntity": [{"@type": "Question", "name": "Which AI models do you use?", "acceptedAnswer": {"@type": "Answer", "text": "Whichever fits the use case, your data-handling obligations and your budget. That includes managed model APIs from the major providers and open-weight models deployed privately inside your own cloud account. We recommend, you decide, and we build so the model can be swapped later."}}, {"@type": "Question", "name": "Will our data be used to train models?", "acceptedAnswer": {"@type": "Answer", "text": "No. We build on services and deployment patterns where your data is not used for training, and we keep it inside your own cloud environment wherever possible. Access is controlled through your existing identity provider."}}, {"@type": "Question", "name": "How do you stop the system making things up?", "acceptedAnswer": {"@type": "Answer", "text": "By grounding answers in your own documents through retrieval, by testing against a set of known questions before launch, by constraining what the system may say when it is unsure, and by monitoring answer quality continuously afterwards."}}, {"@type": "Question", "name": "How long does a first project take?", "acceptedAnswer": {"@type": "Answer", "text": "A scoped first use case typically reaches a working, tested system in a matter of weeks rather than months. The scoping call is where we give you a realistic estimate for your situation."}}, {"@type": "Question", "name": "Do we need a data science team?", "acceptedAnswer": {"@type": "Answer", "text": "No. We handle the engineering. What we need from you is access to the people who do the work today, because they know which answers are right."}}, {"@type": "Question", "name": "What happens after launch?", "acceptedAnswer": {"@type": "Answer", "text": "The system is monitored, secured and improved as a managed service: model updates, prompt and retrieval tuning, cost tracking and new capabilities. You are not left holding a prototype."}}]}]}</script>
-<!-- Google tag (gtag.js) with Consent Mode v2: analytics cookies stay off until the visitor accepts -->
+<!-- Google tag (gtag.js) with Consent Mode v2: analytics and ad cookies stay off until the visitor accepts -->
 <script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}
 gtag('consent','default',{ad_storage:'denied',ad_user_data:'denied',ad_personalization:'denied',analytics_storage:'denied',wait_for_update:500});
-gtag('js',new Date());gtag('config','G-YT6G7B299N');</script>
+gtag('js',new Date());gtag('config','G-YT6G7B299N');gtag('config','AW-11186762541');</script>
 <script async src="https://www.googletagmanager.com/gtag/js?id=G-YT6G7B299N"></script>
 </head>
 <body>
@@ -216,7 +216,7 @@ gtag('js',new Date());gtag('config','G-YT6G7B299N');</script>
   </div>
 </footer>
 <div class="consent" id="consent" hidden role="dialog" aria-label="Cookie consent" aria-live="polite">
-  <p>We use Google Analytics to understand how the site is used. No analytics cookies are set unless you accept.</p>
+  <p>We use Google Analytics and Google Ads to understand how the site is used and measure our ads. No analytics or ad cookies are set unless you accept.</p>
   <div class="consent-actions"><button type="button" class="btn btn-primary" id="consentAccept">Accept</button><button type="button" class="btn btn-ghost" id="consentDecline">Decline</button></div>
 </div>
 <script>
@@ -234,11 +234,14 @@ document.getElementById('yr').textContent=new Date().getFullYear();
   var box=document.getElementById('consent'),KEY='o3-consent';
   function read(){try{return localStorage.getItem(KEY);}catch(e){return null;}}
   function write(v){try{localStorage.setItem(KEY,v);}catch(e){}}
-  function apply(v){if(v==='granted'&&window.gtag){gtag('consent','update',{analytics_storage:'granted'});}}
+  function apply(v){if(v==='granted'&&window.gtag){gtag('consent','update',{analytics_storage:'granted',ad_storage:'granted',ad_user_data:'granted'});console.debug('[consent] granted');}}
   var saved=read(); if(saved){apply(saved);} else {box.hidden=false;}
   document.getElementById('consentAccept').addEventListener('click',function(){write('granted');apply('granted');box.hidden=true;});
   document.getElementById('consentDecline').addEventListener('click',function(){write('denied');box.hidden=true;});
   document.getElementById('cookiePrefs').addEventListener('click',function(){box.hidden=false;});
+  function conv(label,name){if(window.gtag){gtag('event','conversion',{send_to:'AW-11186762541/'+label,value:1.0,currency:'AUD',transport_type:'beacon'});console.debug('[gads] '+name+' conversion fired');}}
+  document.addEventListener('click',function(e){var a=e.target.closest&&e.target.closest('a[href^="https://calendly.com/"]');if(a){conv('M0IACILd64sdEK3modYp','book_call');}});
+  var cf=document.querySelector('form[name="email-form"]');if(cf){cf.addEventListener('submit',function(){conv('ZTATCPmI64sdEK3modYp','contact_form');});}
 })();
 </script>
 </body>

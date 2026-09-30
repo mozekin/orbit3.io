@@ -8,6 +8,10 @@ SITE = "https://orbit3.io"
 CAL = "https://calendly.com/martin-orbit3/introductory-call"
 LINKEDIN = "https://linkedin.com/company/orbit3"
 GA = "G-YT6G7B299N"
+# Google Ads (account 839-394-1491): conversion tag and labels
+AW = "AW-11186762541"
+AW_LEAD = "ZTATCPmI64sdEK3modYp"   # Contact form (website)
+AW_BOOK = "M0IACILd64sdEK3modYp"   # Book call click (website)
 TODAY = "2026-09-03"
 CSS_VER = hashlib.sha1(open("css/orbit3.css", "rb").read()).hexdigest()[:8]
 
@@ -142,7 +146,7 @@ def footer():
   </div>
 </footer>
 <div class="consent" id="consent" hidden role="dialog" aria-label="Cookie consent" aria-live="polite">
-  <p>We use Google Analytics to understand how the site is used. No analytics cookies are set unless you accept.</p>
+  <p>We use Google Analytics and Google Ads to understand how the site is used and measure our ads. No analytics or ad cookies are set unless you accept.</p>
   <div class="consent-actions"><button type="button" class="btn btn-primary" id="consentAccept">Accept</button><button type="button" class="btn btn-ghost" id="consentDecline">Decline</button></div>
 </div>
 <script>
@@ -160,11 +164,14 @@ document.getElementById('yr').textContent=new Date().getFullYear();
   var box=document.getElementById('consent'),KEY='o3-consent';
   function read(){{try{{return localStorage.getItem(KEY);}}catch(e){{return null;}}}}
   function write(v){{try{{localStorage.setItem(KEY,v);}}catch(e){{}}}}
-  function apply(v){{if(v==='granted'&&window.gtag){{gtag('consent','update',{{analytics_storage:'granted'}});}}}}
+  function apply(v){{if(v==='granted'&&window.gtag){{gtag('consent','update',{{analytics_storage:'granted',ad_storage:'granted',ad_user_data:'granted'}});console.debug('[consent] granted');}}}}
   var saved=read(); if(saved){{apply(saved);}} else {{box.hidden=false;}}
   document.getElementById('consentAccept').addEventListener('click',function(){{write('granted');apply('granted');box.hidden=true;}});
   document.getElementById('consentDecline').addEventListener('click',function(){{write('denied');box.hidden=true;}});
   document.getElementById('cookiePrefs').addEventListener('click',function(){{box.hidden=false;}});
+  function conv(label,name){{if(window.gtag){{gtag('event','conversion',{{send_to:'{AW}/'+label,value:1.0,currency:'AUD',transport_type:'beacon'}});console.debug('[gads] '+name+' conversion fired');}}}}
+  document.addEventListener('click',function(e){{var a=e.target.closest&&e.target.closest('a[href^="https://calendly.com/"]');if(a){{conv('{AW_BOOK}','book_call');}}}});
+  var cf=document.querySelector('form[name="email-form"]');if(cf){{cf.addEventListener('submit',function(){{conv('{AW_LEAD}','contact_form');}});}}
 }})();
 </script>
 </body>
@@ -209,10 +216,10 @@ def head(path, title, desc, ld_graph, robots="index, follow, max-image-preview:l
 <link href="/css/orbit3.css?v={CSS_VER}" rel="stylesheet">
 <script>document.documentElement.classList.add('js');</script>
 <script type="application/ld+json">{ld}</script>
-<!-- Google tag (gtag.js) with Consent Mode v2: analytics cookies stay off until the visitor accepts -->
+<!-- Google tag (gtag.js) with Consent Mode v2: analytics and ad cookies stay off until the visitor accepts -->
 <script>window.dataLayer=window.dataLayer||[];function gtag(){{dataLayer.push(arguments);}}
 gtag('consent','default',{{ad_storage:'denied',ad_user_data:'denied',ad_personalization:'denied',analytics_storage:'denied',wait_for_update:500}});
-gtag('js',new Date());gtag('config','{GA}');</script>
+gtag('js',new Date());gtag('config','{GA}');gtag('config','{AW}');</script>
 <script async src="https://www.googletagmanager.com/gtag/js?id={GA}"></script>
 </head>
 <body>

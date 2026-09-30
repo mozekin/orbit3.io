@@ -32,10 +32,10 @@
 <link href="/css/orbit3.css?v=6360739e" rel="stylesheet">
 <script>document.documentElement.classList.add('js');</script>
 <script type="application/ld+json">{"@context": "https://schema.org", "@graph": [{"@type": "Organization", "@id": "https://orbit3.io/#organization", "name": "Orbit3", "url": "https://orbit3.io/", "logo": {"@type": "ImageObject", "url": "https://orbit3.io/images/logo.png", "width": 759, "height": 258}, "image": "https://orbit3.io/images/og-image.png", "description": "Orbit3 is a managed cloud services and AI consultancy. We run cloud and IT operations for growing businesses and build custom AI and automation on top of them.", "email": "hello@orbit3.io", "sameAs": ["https://linkedin.com/company/orbit3"], "founder": {"@type": "Person", "name": "Martin", "jobTitle": "Founder", "url": "https://orbit3.io/about/"}, "knowsAbout": ["Managed cloud services", "CloudOps", "FinOps", "Cloud security", "SOC 2 compliance", "SOC 2 remediation", "Vanta", "DevOps", "Cloud migration", "Backup and disaster recovery", "AI consulting", "LLM implementation", "Workflow automation", "Amazon Web Services", "Microsoft Azure", "Google Cloud"], "contactPoint": {"@type": "ContactPoint", "contactType": "sales", "email": "hello@orbit3.io", "url": "https://calendly.com/martin-orbit3/introductory-call", "availableLanguage": "English"}}, {"@type": "Service", "@id": "https://orbit3.io/Services/cloudops-managed-services/#service", "name": "CloudOps Managed Services", "serviceType": "Managed cloud services", "description": "Managed cloud services from Orbit3: 24/7 monitoring, patching, security, backup and cost control for AWS, Azure and Google Cloud, with one accountable team.", "url": "https://orbit3.io/Services/cloudops-managed-services/", "provider": {"@id": "https://orbit3.io/#organization"}, "areaServed": {"@type": "Place", "name": "Worldwide"}, "offers": {"@type": "Offer", "url": "https://calendly.com/martin-orbit3/introductory-call", "description": "Free 30-minute introductory call"}}, {"@type": "BreadcrumbList", "itemListElement": [{"@type": "ListItem", "position": 1, "name": "Home", "item": "https://orbit3.io/"}, {"@type": "ListItem", "position": 2, "name": "Services", "item": "https://orbit3.io/Services/"}, {"@type": "ListItem", "position": 3, "name": "CloudOps Managed Services"}]}, {"@type": "FAQPage", "mainEntity": [{"@type": "Question", "name": "What does 'managed' actually cover?", "acceptedAnswer": {"@type": "Answer", "text": "Everything needed to keep the environment secure, available and cost-efficient: monitoring, incident response, patching, access management, security posture, backup operations and cost management. We agree the exact scope and response targets in writing before we start, so there is no ambiguity about what we own."}}, {"@type": "Question", "name": "Do we keep ownership of our cloud accounts?", "acceptedAnswer": {"@type": "Answer", "text": "Yes. The accounts, data and infrastructure stay in your name and under your control. We work through delegated, least-privilege access that you can revoke at any time, and every change we make goes through version control."}}, {"@type": "Question", "name": "How is it priced?", "acceptedAnswer": {"@type": "Answer", "text": "As a fixed monthly fee scoped to your environment, agreed before we start. Project work such as a migration or a security remediation is quoted separately, so your operations fee stays predictable."}}, {"@type": "Question", "name": "Can you work alongside our existing engineers?", "acceptedAnswer": {"@type": "Answer", "text": "That is the most common arrangement. Your team keeps building; we take the operational load and share what we see. Many clients pair us with one internal engineer who acts as our day-to-day contact."}}, {"@type": "Question", "name": "What if we are on more than one cloud, or partly on-premises?", "acceptedAnswer": {"@type": "Answer", "text": "That is normal. We run environments that span AWS, Azure and Google Cloud, and hybrid estates with on-premises servers or a colocated data centre are within scope."}}, {"@type": "Question", "name": "How quickly can you start?", "acceptedAnswer": {"@type": "Answer", "text": "Discovery typically begins within a week of agreement. Most environments are at a stable baseline within the first month; complex estates take longer and we will tell you that up front."}}]}]}</script>
-<!-- Google tag (gtag.js) with Consent Mode v2: analytics cookies stay off until the visitor accepts -->
+<!-- Google tag (gtag.js) with Consent Mode v2: analytics and ad cookies stay off until the visitor accepts -->
 <script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}
 gtag('consent','default',{ad_storage:'denied',ad_user_data:'denied',ad_personalization:'denied',analytics_storage:'denied',wait_for_update:500});
-gtag('js',new Date());gtag('config','G-YT6G7B299N');</script>
+gtag('js',new Date());gtag('config','G-YT6G7B299N');gtag('config','AW-11186762541');</script>
 <script async src="https://www.googletagmanager.com/gtag/js?id=G-YT6G7B299N"></script>
 </head>
 <body>
@@ -203,7 +203,7 @@ gtag('js',new Date());gtag('config','G-YT6G7B299N');</script>
   </div>
 </footer>
 <div class="consent" id="consent" hidden role="dialog" aria-label="Cookie consent" aria-live="polite">
-  <p>We use Google Analytics to understand how the site is used. No analytics cookies are set unless you accept.</p>
+  <p>We use Google Analytics and Google Ads to understand how the site is used and measure our ads. No analytics or ad cookies are set unless you accept.</p>
   <div class="consent-actions"><button type="button" class="btn btn-primary" id="consentAccept">Accept</button><button type="button" class="btn btn-ghost" id="consentDecline">Decline</button></div>
 </div>
 <script>
@@ -221,11 +221,14 @@ document.getElementById('yr').textContent=new Date().getFullYear();
   var box=document.getElementById('consent'),KEY='o3-consent';
   function read(){try{return localStorage.getItem(KEY);}catch(e){return null;}}
   function write(v){try{localStorage.setItem(KEY,v);}catch(e){}}
-  function apply(v){if(v==='granted'&&window.gtag){gtag('consent','update',{analytics_storage:'granted'});}}
+  function apply(v){if(v==='granted'&&window.gtag){gtag('consent','update',{analytics_storage:'granted',ad_storage:'granted',ad_user_data:'granted'});console.debug('[consent] granted');}}
   var saved=read(); if(saved){apply(saved);} else {box.hidden=false;}
   document.getElementById('consentAccept').addEventListener('click',function(){write('granted');apply('granted');box.hidden=true;});
   document.getElementById('consentDecline').addEventListener('click',function(){write('denied');box.hidden=true;});
   document.getElementById('cookiePrefs').addEventListener('click',function(){box.hidden=false;});
+  function conv(label,name){if(window.gtag){gtag('event','conversion',{send_to:'AW-11186762541/'+label,value:1.0,currency:'AUD',transport_type:'beacon'});console.debug('[gads] '+name+' conversion fired');}}
+  document.addEventListener('click',function(e){var a=e.target.closest&&e.target.closest('a[href^="https://calendly.com/"]');if(a){conv('M0IACILd64sdEK3modYp','book_call');}});
+  var cf=document.querySelector('form[name="email-form"]');if(cf){cf.addEventListener('submit',function(){conv('ZTATCPmI64sdEK3modYp','contact_form');});}
 })();
 </script>
 </body>
