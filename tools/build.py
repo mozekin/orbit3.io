@@ -801,7 +801,7 @@ service_page(
       ]},
  included=[
   ("Cost and usage analysis", "Billing data broken down by service, account, environment and workload, with the trends and anomalies explained in plain English."),
-  ("Tagging and cost allocation", "A tagging standard and enforcement so every pound can be attributed to a team, product or customer."),
+  ("Tagging and cost allocation", "A tagging standard and enforcement so every dollar can be attributed to a team, product or customer."),
   ("Right-sizing", "Compute instances, containers, databases and storage tiers matched to observed utilisation, with the evidence for each change."),
   ("Scheduling and idle clean-up", "Non-production environments shut down out of hours; orphaned volumes, snapshots, load balancers and addresses removed."),
   ("Commitment and discount planning", "Reserved instances, savings plans and committed-use discounts sized to your stable baseline, with the break-even shown."),
@@ -1155,7 +1155,7 @@ def home():
     </div>
     {cards3([
       {"icon": "shield", "h": "Stay secure &amp; running", "p": "24/7 monitoring, patching and proactive management of your cloud and IT. We catch and fix issues before they reach your customers."},
-      {"icon": "coins", "h": "Control your spend", "p": "We right-size and govern your cloud costs with FinOps discipline, removing waste and giving you transparency over every pound."},
+      {"icon": "coins", "h": "Control your spend", "p": "We right-size and govern your cloud costs with FinOps discipline, removing waste and giving you transparency over every dollar."},
       {"icon": "robot", "h": "Move faster with AI", "p": "Custom AI assistants, LLM applications and workflow automation that take real work off your team's plate, then run as a managed service."},
     ])}
   </div>
