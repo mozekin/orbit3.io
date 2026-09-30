@@ -547,7 +547,7 @@ AI_TRAIN = [
 ]
 AI_DEMO = [
  {"q": "Why did our AWS bill jump last week?",
-  "a": "Spend rose 23% (£4,180) week on week. Most of it came from six m6i.4xlarge nodes the EKS autoscaler added on Tuesday that never scaled back in. Capping the node group at 8 and adding a scale-down policy saves about £2,950 a month. Shall I raise the pull request?"},
+  "a": "Spend rose 23% ($4,180) week on week. Most of it came from six m6i.4xlarge nodes the EKS autoscaler added on Tuesday that never scaled back in. Capping the node group at 8 and adding a scale-down policy saves about $2,950 a month. Shall I raise the pull request?"},
  {"q": "Is anything in production publicly exposed?",
   "a": "Two findings. The S3 bucket invoices-export allows public read and was created three days ago, and security group sg-legacy-admin opens port 22 to the whole internet. Both are managed in Terraform, so I've drafted the fixes as a plan for your review."},
  {"q": "Did last night's backups all succeed?",
