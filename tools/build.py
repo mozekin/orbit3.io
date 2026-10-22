@@ -114,6 +114,113 @@ def header(current):
 </nav>
 <main id="main">'''
 
+# ---------------------------------------------------------------- lead capture (Hormozi-style free offers)
+# Every service page leads with a named, free, low-risk check that solves a small problem and shows the bigger one.
+# The form posts to Formspree; FORM_ACTION is the only line to change when moving to a Formspree form ID.
+FORM_ACTION = "https://formspree.io/martin@orbit3.io"
+FOCUS = ["Managed cloud operations", "Cloud costs", "Cloud security", "SOC 2", "Essential Eight", "AI use cases",
+         "Workflow automation", "Cloud migration", "DevOps &amp; CI/CD", "Backup &amp; recovery", "Not sure yet"]
+OFFERS = {
+ "home": dict(name="Free Cloud &amp; AI Health Check", btn="Get my free health check", focus="Not sure yet",
+   h2="Get a free expert check on your cloud or AI plans",
+   p="Tell us what's on your mind. Within 2 business days you'll get a one-page summary: what we'd fix or build first, what it's worth, and what it would take. Keep it whether or not you work with us.",
+   gets=["Your top 3 risks or cost leaks, ranked by impact", "The first fix we'd make, and roughly what it takes", "A straight answer on whether you need outside help at all"],
+   ph="What's slowing you down, or what are you trying to build?"),
+ "cloudops-managed-services": dict(name="Free Cloud Health Check", btn="Get my free health check", focus="Managed cloud operations",
+   h2="Find out what's quietly putting your cloud at risk",
+   p="Share a little about your environment and we'll send a one-page health check within 2 business days: where you're exposed, where you're overspending, and what to fix first.",
+   gets=["Top 3 reliability and security risks", "Top 3 cost leaks, with rough monthly savings", "What we'd fix in the first 30 days"],
+   ph="Which cloud, roughly how big, and what keeps you up at night?"),
+ "cloud-optimisation": dict(name="Free Cloud Cost Check", btn="Get my free cost check", focus="Cloud costs",
+   h2="See where your cloud bill is leaking money",
+   p="Tell us your rough monthly spend and main services. Within 2 business days you'll get your biggest savings opportunities, with rough dollar figures.",
+   gets=["Savings opportunities ranked by dollars per month", "Quick wins your team can action this week", "Where right-sizing or commitment discounts would pay off"],
+   ph="Which cloud, roughly what you spend a month, and what's driving it?"),
+ "cloud-security": dict(name="Free Cloud Security Snapshot", btn="Get my free security snapshot", focus="Cloud security",
+   h2="Know your biggest cloud security gaps before someone else does",
+   p="Tell us about your environment and we'll send a one-page snapshot within 2 business days: the exposures that matter most and the order to fix them.",
+   gets=["Top 5 risks across identity, network exposure and logging", "Which ones an attacker or auditor would find first", "A prioritised fix list"],
+   ph="Which cloud, and is there a customer, audit or incident driving this?"),
+ "soc2-compliance": dict(name="Free SOC 2 Gap Triage", btn="Get my free gap triage", focus="SOC 2",
+   h2="Turn your wall of failing Vanta tests into a plan",
+   p="Tell us where you're at (we'll ask for a screenshot or export of your failing tests by email). Within 2 business days we'll sort them: quick fixes, real engineering work, and what's blocking your audit date.",
+   gets=["Every failing test sorted into quick fix vs real work", "A realistic effort estimate to get audit-ready", "The order to tackle them so your timeline holds"],
+   ph="Are you in Vanta yet, roughly how many tests are failing, and when is your audit?"),
+ "essential-eight": dict(name="Free Essential Eight Gap Check", btn="Get my free gap check", focus="Essential Eight",
+   h2="Find out where you really sit on the Essential Eight",
+   p="Answer a few questions about your environment and we'll send a one-page gap check within 2 business days: your likely maturity level per control and the gaps to close first.",
+   gets=["Likely maturity level for each of the eight controls", "The three gaps to close first for your target level", "Rough effort to get there"],
+   ph="What maturity level are you targeting, and who is asking for it?"),
+ "ai-solutions": dict(name="Free AI Use-Case Workshop", btn="Request my free workshop", focus="AI use cases",
+   h2="Find the AI projects actually worth doing in your business",
+   p="A free 45-minute workshop with Martin. We map where AI can take real work off your team, and you leave with a one-page plan: the top 3 use cases, what each takes, and the expected payback.",
+   gets=["Top 3 AI use cases ranked by payback", "What each would take to build and run safely", "Which one to start with, and why"],
+   ph="What does your team spend too much time on, or what AI idea are you weighing up?"),
+ "ai-automation": dict(name="Free Automation Audit", btn="Get my free automation audit", focus="Workflow automation",
+   h2="Find the repetitive work AI can take off your team",
+   p="Describe a workflow that eats your team's time. Within 2 business days we'll send back which steps can be automated, the hours it would save, and what it takes to build.",
+   gets=["The steps that can be automated, and the ones that can't", "Estimated hours saved per week", "What it would take to build and run"],
+   ph="Describe the workflow: who does it, how often, and which tools it touches."),
+ "cloud-adoption": dict(name="Free Migration Readiness Check", btn="Get my free readiness check", focus="Cloud migration",
+   h2="Know your migration path before you commit",
+   p="Tell us what you're running today and where you want to get to. Within 2 business days you'll get a one-page readiness check: recommended path, key risks and a realistic timeline.",
+   gets=["Recommended migration path for your workloads", "The risks most likely to bite, and how to avoid them", "A realistic timeline and first steps"],
+   ph="What are you running today, and where do you want it to land?"),
+ "cloud-devops": dict(name="Free Delivery Pipeline Review", btn="Get my free pipeline review", focus="DevOps &amp; CI/CD",
+   h2="Find what's slowing your releases down",
+   p="Tell us how you build and deploy today. Within 2 business days we'll send the bottlenecks we'd fix first across your CI/CD, infrastructure as code and monitoring.",
+   gets=["The biggest bottlenecks between commit and production", "Where infrastructure as code would remove risk", "The first three improvements, in order"],
+   ph="How do you build and deploy today, and what hurts most?"),
+ "cloud-backup": dict(name="Free Backup &amp; Recovery Check", btn="Get my free recovery check", focus="Backup &amp; recovery",
+   h2="Find out if you could actually recover",
+   p="Tell us how your backups are set up. Within 2 business days you'll get a one-page check: gaps against your recovery goals, untested restores and what to fix first.",
+   gets=["Gaps against your recovery time and data-loss goals", "What isn't backed up, or hasn't been test-restored", "What to fix first"],
+   ph="What do you back up today, where to, and when did you last test a restore?"),
+}
+
+def lead_form(key, heading="", btn=None, form_name="lead-form", subject=None):
+    o = OFFERS[key]
+    opts = "".join(f'<option{" selected" if f == o["focus"] else ""}>{f}</option>' for f in FOCUS)
+    attr = "".join(f'<input type="hidden" name="{n}" value="">' for n in ("page", "gclid", "utm_source", "utm_medium", "utm_campaign", "utm_content", "utm_term"))
+    subject = subject or html.unescape(o["name"])
+    return f'''<form class="form" action="{FORM_ACTION}" method="POST" name="{form_name}" data-lead="{key}">{heading}
+        <input type="hidden" name="_subject" value="New lead: {html.escape(subject)} (orbit3.io)">
+        <input type="hidden" name="offer" value="{html.escape(subject)}">{attr}
+        <div class="hp" aria-hidden="true"><label for="gotcha-{key}">Leave this empty</label><input type="text" id="gotcha-{key}" name="_gotcha" tabindex="-1" autocomplete="off"></div>
+        <div class="field-row">
+          <div class="field"><label for="name-{key}">Name</label><input class="input" type="text" id="name-{key}" name="name" autocomplete="name" required></div>
+          <div class="field"><label for="email-{key}">Work email</label><input class="input" type="email" id="email-{key}" name="email" autocomplete="email" placeholder="you@company.com" required></div>
+        </div>
+        <div class="field-row">
+          <div class="field"><label for="company-{key}">Company <span class="opt">(optional)</span></label><input class="input" type="text" id="company-{key}" name="company" autocomplete="organization"></div>
+          <div class="field"><label for="phone-{key}">Phone <span class="opt">(optional)</span></label><input class="input" type="tel" id="phone-{key}" name="phone" autocomplete="tel" placeholder="+61 ..."></div>
+        </div>
+        <div class="field"><label for="focus-{key}">What should we look at?</label><select class="input select" id="focus-{key}" name="focus">{opts}</select></div>
+        <div class="field"><label for="msg-{key}">Anything we should know? <span class="opt">(optional)</span></label><textarea class="textarea" id="msg-{key}" name="message" rows="3" placeholder="{o["ph"]}"></textarea></div>
+        <button class="btn btn-primary btn-block btn-lg" type="submit">{btn or o["btn"]}</button>
+        <p class="form-note">We reply within one business day. No sales pitch, no obligation. Prefer to talk? <a href="{CAL}" target="_blank" rel="noopener noreferrer">Book a 30-minute call</a>.</p>
+      </form>'''
+
+def lead_section(key):
+    o = OFFERS[key]
+    gets = "".join(f'<li>{I["check"]}<span>{g}</span></li>' for g in o["gets"])
+    return f'''<section class="section lead" id="get-started">
+  <div class="container split" style="align-items:start">
+    <div class="reveal">
+      <span class="eyebrow">{o["name"]}</span>
+      <h2>{o["h2"]}</h2>
+      <p class="lede">{o["p"]}</p>
+      <h3 class="lead-gets-h">What you get</h3>
+      <ul class="checklist">{gets}</ul>
+      <p class="lead-proof">Every check is done personally by Martin Ozekin, founder and AWS Certified Solutions Architect &ndash; Professional, with 10+ years running AWS, Azure and Google Cloud.</p>
+    </div>
+    <div class="card card--primary lead-card reveal">
+      {lead_form(key)}
+    </div>
+  </div>
+</section>
+<a class="sticky-cta" href="#get-started">{o["btn"]} {I["arrow"]}</a>'''
+
 def footer():
     svc = "".join(f'<a href="{SURL[s]}">{n}</a>' for s, n in SERVICES)
     return f'''</main>
@@ -179,7 +286,18 @@ document.getElementById('yr').textContent=new Date().getFullYear();
   document.getElementById('cookiePrefs').addEventListener('click',function(){{box.hidden=false;}});
   function conv(label,name){{if(window.gtag){{gtag('event','conversion',{{send_to:'{AW}/'+label,value:1.0,currency:'AUD',transport_type:'beacon'}});console.debug('[gads] '+name+' conversion fired');}}}}
   document.addEventListener('click',function(e){{var a=e.target.closest&&e.target.closest('a[href^="https://calendly.com/"]');if(a){{conv('{AW_BOOK}','book_call');}}}});
-  var cf=document.querySelector('form[name="email-form"]');if(cf){{cf.addEventListener('submit',function(){{conv('{AW_LEAD}','contact_form');}});}}
+  var AK='o3-attr',attr={{}},q=new URLSearchParams(location.search);
+  try{{attr=JSON.parse(sessionStorage.getItem(AK)||'{{}}');}}catch(e){{}}
+  ['gclid','utm_source','utm_medium','utm_campaign','utm_content','utm_term'].forEach(function(k){{if(q.get(k)){{attr[k]=q.get(k);}}}});
+  if(!attr.page){{attr.page=location.pathname;}}
+  try{{sessionStorage.setItem(AK,JSON.stringify(attr));}}catch(e){{}}
+  document.querySelectorAll('form[data-lead]').forEach(function(f){{
+    Object.keys(attr).forEach(function(k){{if(f.elements[k]){{f.elements[k].value=attr[k];}}}});
+    if(f.elements.page){{f.elements.page.value=attr.page+(attr.page!==location.pathname?' -> '+location.pathname:'');}}
+    f.addEventListener('submit',function(){{conv('{AW_LEAD}','lead_form:'+f.getAttribute('data-lead'));}});
+  }});
+  var sc=document.querySelector('.sticky-cta'),gs=document.getElementById('get-started');
+  if(sc&&gs&&'IntersectionObserver' in window){{new IntersectionObserver(function(es){{sc.classList.toggle('is-hidden',es[0].isIntersecting);}}).observe(gs);}}
 }})();
 </script>
 </body>
@@ -240,7 +358,13 @@ def crumbs(items):
     parts = [f'<a href="{u}">{n}</a>' if u else html.escape(n) for n, u in items]
     return ld, '<nav class="breadcrumb" aria-label="Breadcrumb">' + " / ".join(parts) + "</nav>"
 
-def cta_buttons(primary="Book a free intro call"):
+def cta_buttons(primary="Book a free intro call", offer=None):
+    if offer:
+        return f'''<div class="hero-actions">
+      <a class="btn btn-primary btn-lg" href="#get-started">{offer["btn"]} {I["arrow"]}</a>
+      <a class="btn btn-ghost btn-lg" href="{CAL}" target="_blank" rel="noopener noreferrer">{I["cal"]} Book a call instead</a>
+    </div>
+    <div class="hero-trust">{offer["name"]} · Done personally by our founder · Reply within one business day</div>'''
     return f'''<div class="hero-actions">
       <a class="btn btn-primary btn-lg" href="{CAL}" target="_blank" rel="noopener noreferrer">{I["cal"]} {primary}</a>
       <a class="btn btn-ghost btn-lg" href="/contact/">Send a message {I["arrow"]}</a>
@@ -331,7 +455,7 @@ def service_page(slug, title, desc, h1, lede, eyebrow, h2, intro_paras, bullets,
     {crumb_html}
     <h1 class="measure">{h1}</h1>
     <p class="lede measure">{lede}</p>
-    {cta_buttons()}{hero_extra}
+    {cta_buttons(offer=OFFERS[slug])}{hero_extra}
   </div>
 </section>
 <section class="section">
@@ -380,7 +504,7 @@ def service_page(slug, title, desc, h1, lede, eyebrow, h2, intro_paras, bullets,
 {extra_sections}
 {faq_html}
 {related(rel, RELATED_INTRO[slug])}
-{cta_band(cta["eyebrow"], cta["h2"], cta["p"], cta.get("btn", "Book a free intro call"))}
+{lead_section(slug)}
 '''
     write(path, head(path, title, desc, [ORG, svc_ld, crumb_ld, faq_ld]) + header(path) + body + footer())
 
@@ -1307,11 +1431,7 @@ def home():
   <div class="container">
     <h1><span class="eyebrow eyebrow--center" style="display:flex;flex-wrap:wrap">Managed cloud services &amp; AI consulting, Sydney</span>Your technology, <span class="text-gradient">fully managed.</span><br>Your AI, finally shipped.</h1>
     <p class="lede measure">Orbit3 is your Sydney-based outsourced tech team. We provide managed cloud services that keep your cloud and IT operations secure, reliable and cost-efficient, and we build the custom AI and automation that give you an edge. One accountable partner.</p>
-    <div class="hero-actions">
-      <a class="btn btn-primary btn-lg" href="{CAL}" target="_blank" rel="noopener noreferrer">{I["cal"]} Book a free intro call</a>
-      <a class="btn btn-ghost btn-lg" href="/Services/">See what we do {I["arrow"]}</a>
-    </div>
-    <div class="hero-trust">Free 30-minute call · No obligation · We reply within one business day</div>
+    {cta_buttons(offer=OFFERS["home"])}
     <div class="hero-term" aria-hidden="true">
       <div class="hero-term-bar"><span></span><span></span><span></span><em>orbit3 — terraform — prod</em></div>
       <div class="hero-term-body">
@@ -1406,7 +1526,7 @@ def home():
     </div>
   </div>
 </section>
-{cta_band("Let's find your fastest win", "Book a free 30-minute intro call", "We'll look at where your tech operations are costing you time or money, and where AI could give you an edge, and tell you honestly what's worth doing first.", "Book your free intro call")}
+{lead_section("home")}
 '''
     write(path, head(path, "Managed Cloud Services & AI Consulting Sydney | Orbit3",
                      "Sydney-based managed cloud services and AI consulting. We run your cloud operations on AWS, Azure and Google Cloud and build custom AI. Book a free call.",
@@ -1513,13 +1633,7 @@ def contact():
     <div class="card reveal">
       <h2 style="font-size:1.5rem">Send us a message</h2>
       <p>Tell us about your project and we'll figure out the best option. Prefer email? <a href="mailto:hello@orbit3.io" style="color:var(--accent)">hello@orbit3.io</a></p>
-      <form class="form mt-1" action="https://formspree.io/martin@orbit3.io" method="POST" name="email-form">
-        <div class="field"><label for="name">Name</label><input class="input" type="text" id="name" name="name" placeholder="Your name" autocomplete="name" required></div>
-        <div class="field"><label for="email">Email</label><input class="input" type="email" id="email" name="email" placeholder="you@company.com" autocomplete="email" required></div>
-        <div class="field"><label for="Phone">Phone <span style="color:var(--fg-faint)">(optional)</span></label><input class="input" type="tel" id="Phone" name="Phone" placeholder="+61 ..." autocomplete="tel"></div>
-        <div class="field"><label for="Message">How can we help?</label><textarea class="textarea" id="Message" name="Message" placeholder="A sentence or two about what you're trying to achieve." required></textarea></div>
-        <button class="btn btn-primary btn-block btn-lg" type="submit">Send message</button>
-      </form>
+      {lead_form("home", btn="Send message", form_name="email-form", subject="Contact form")}
     </div>
     <div class="reveal">
       <div class="card card--primary">
