@@ -36,13 +36,18 @@ I = {
  "linkedin": '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M4.98 3.5a2.5 2.5 0 1 0 0 5 2.5 2.5 0 0 0 0-5zM3 9h4v12H3zM9 9h3.8v1.7h.05c.53-1 1.83-2.05 3.77-2.05C20.4 8.65 21 11 21 14.1V21h-4v-6.1c0-1.45-.03-3.3-2-3.3-2 0-2.3 1.57-2.3 3.2V21H9z"/></svg>',
 }
 
+I["bolt"] = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M13 2L4 14h7l-1 8 9-12h-7z"/></svg>'
+I["badge"] = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="9" r="6"/><path d="M8.5 13.5L7 22l5-3 5 3-1.5-8.5"/><path d="M9.5 9l1.8 1.8 3.5-3.3"/></svg>'
+
 # ---------------------------------------------------------------- services registry
 SERVICES = [
  ("cloudops-managed-services", "CloudOps Managed Services"),
  ("ai-solutions", "AI Solutions"),
+ ("ai-automation", "AI Automation"),
  ("cloud-adoption", "Cloud Adoption"),
  ("cloud-security", "Cloud Security"),
  ("soc2-compliance", "SOC 2 Compliance"),
+ ("essential-eight", "Essential Eight"),
  ("cloud-optimisation", "Cloud Optimisation"),
  ("cloud-devops", "Cloud DevOps"),
  ("cloud-backup", "Cloud Backup"),
@@ -54,10 +59,12 @@ ORG = {
  "@type": "Organization", "@id": f"{SITE}/#organization", "name": "Orbit3", "url": f"{SITE}/",
  "logo": {"@type": "ImageObject", "url": f"{SITE}/images/logo.png", "width": 759, "height": 258},
  "image": f"{SITE}/images/og-image.png",
- "description": "Orbit3 is a managed cloud services and AI consultancy. We run cloud and IT operations for growing businesses and build custom AI and automation on top of them.",
+ "description": "Orbit3 is a Sydney-based managed cloud services and AI consultancy working with businesses across Australia. We run cloud and IT operations for growing businesses and build custom AI and automation on top of them.",
+ "address": {"@type": "PostalAddress", "addressLocality": "Sydney", "addressRegion": "NSW", "addressCountry": "AU"},
+ "areaServed": [{"@type": "City", "name": "Sydney"}, {"@type": "Country", "name": "Australia"}],
  "email": "hello@orbit3.io",
  "sameAs": [LINKEDIN],
- "founder": {"@type": "Person", "name": "Martin", "jobTitle": "Founder", "url": f"{SITE}/about/"},
+ "founder": {"@type": "Person", "@id": f"{SITE}/about/#founder", "name": "Martin Ozekin", "jobTitle": "Founder", "url": f"{SITE}/about/", "hasCredential": {"@type": "EducationalOccupationalCredential", "name": "AWS Certified Solutions Architect – Professional", "credentialCategory": "certification", "recognizedBy": {"@type": "Organization", "name": "Amazon Web Services"}}},
  "knowsAbout": ["Managed cloud services", "CloudOps", "FinOps", "Cloud security", "SOC 2 compliance", "SOC 2 remediation", "Vanta", "DevOps", "Cloud migration", "Backup and disaster recovery", "AI consulting", "LLM implementation", "Workflow automation", "Amazon Web Services", "Microsoft Azure", "Google Cloud"],
  "contactPoint": {"@type": "ContactPoint", "contactType": "sales", "email": "hello@orbit3.io", "url": CAL, "availableLanguage": "English"},
 }
@@ -115,7 +122,7 @@ def footer():
     <div class="footer-top">
       <div class="footer-brand">
         <img src="/images/logo-white.webp" alt="Orbit3" width="88" height="30">
-        <p>Managed cloud services and AI consulting. We run your cloud and IT operations and build the AI that moves your business forward.</p>
+        <p>Sydney-based managed cloud services and AI consulting, working with businesses across Australia. We run your cloud and IT operations and build the AI that moves your business forward.</p>
       </div>
       <div class="footer-col">
         <div class="footer-col-title">Services</div>
@@ -133,6 +140,7 @@ def footer():
         <div class="footer-col-title">Get started</div>
         <a href="{CAL}" target="_blank" rel="noopener noreferrer">Book a free intro call</a>
         <a href="mailto:hello@orbit3.io">hello@orbit3.io</a>
+        <a href="/contact/">Sydney, NSW, Australia</a>
         <div class="social" style="margin-top:14px">
           <a href="{LINKEDIN}" target="_blank" rel="noopener noreferrer" aria-label="Orbit3 on LinkedIn">{I["linkedin"]}</a>
           <a href="mailto:hello@orbit3.io" aria-label="Email Orbit3">{I["mail"]}</a>
@@ -183,7 +191,7 @@ def head(path, title, desc, ld_graph, robots="index, follow, max-image-preview:l
     ld = json.dumps({"@context": "https://schema.org", "@graph": ld_graph}, ensure_ascii=False)
     t = html.escape(title, quote=True); d = html.escape(desc, quote=True)
     return f'''<!DOCTYPE html>
-<html lang="en">
+<html lang="en-AU">
 <head>
 <meta charset="utf-8">
 <title>{t}</title>
@@ -193,7 +201,7 @@ def head(path, title, desc, ld_graph, robots="index, follow, max-image-preview:l
 <meta name="robots" content="{robots}">
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="Orbit3">
-<meta property="og:locale" content="en_GB">
+<meta property="og:locale" content="en_AU">
 <meta property="og:url" content="{url}">
 <meta property="og:title" content="{t}">
 <meta property="og:description" content="{d}">
@@ -303,13 +311,13 @@ BLURB = {
 }
 
 # ---------------------------------------------------------------- service page builder
-def service_page(slug, title, desc, h1, lede, eyebrow, h2, intro_paras, bullets, panel, who, included, how_h2, how_steps, platforms, faqs, rel, cta, service_type, extra_sections="", hero_bg="", hero_extra=""):
+def service_page(slug, title, desc, h1, lede, eyebrow, h2, intro_paras, bullets, panel, who, included, how_h2, how_steps, platforms, faqs, rel, cta, service_type, extra_sections="", hero_bg="", hero_extra="", platforms_h2="AWS, Azure and Google Cloud"):
     path = SURL[slug]
     crumb_ld, crumb_html = crumbs([("Home", "/"), ("Services", "/Services/"), (SNAME[slug], None)])
     faq_ld, faq_html = faq_section(faqs)
     svc_ld = {"@type": "Service", "@id": SITE + path + "#service", "name": SNAME[slug], "serviceType": service_type,
               "description": desc, "url": SITE + path, "provider": {"@id": f"{SITE}/#organization"},
-              "areaServed": {"@type": "Place", "name": "Worldwide"},
+              "areaServed": [{"@type": "City", "name": "Sydney"}, {"@type": "Country", "name": "Australia"}],
               "offers": {"@type": "Offer", "url": CAL, "description": "Free 30-minute introductory call"}}
     hero_bg = hero_bg and "\n  " + hero_bg
     hero_extra = hero_extra and "\n    " + hero_extra
@@ -365,7 +373,7 @@ def service_page(slug, title, desc, h1, lede, eyebrow, h2, intro_paras, bullets,
 </section>
 <section class="section">
   <div class="container">
-    <div class="center measure" style="margin-bottom:40px"><span class="eyebrow eyebrow--center">Platforms</span><h2>AWS, Azure and Google Cloud</h2><p>{PLATFORM_INTRO[slug]}</p></div>
+    <div class="center measure" style="margin-bottom:40px"><span class="eyebrow eyebrow--center">Platforms</span><h2>{platforms_h2}</h2><p>{PLATFORM_INTRO[slug]}</p></div>
     <div class="grid grid-3">{plat}</div>
   </div>
 </section>
@@ -386,6 +394,8 @@ def included_h2(slug):
      "cloud-optimisation": "Savings that survive next quarter",
      "cloud-devops": "The delivery platform your engineers wish they had",
      "cloud-backup": "Protection that has actually been restored from",
+     "ai-automation": "Everything it takes to automate a workflow properly",
+     "essential-eight": "From an honest baseline to the maturity level you need",
     }[slug]
 
 INCLUDED_INTRO = {
@@ -429,6 +439,27 @@ RELATED_INTRO = {
  "cloud-backup": "Recovery planning sits alongside security and day-to-day operations. These services close the loop.",
 }
 
+BLURB.update({
+ "ai-automation": "AI agents and workflow automation that take repetitive work off your team, across email, documents, CRM, finance and support.",
+ "essential-eight": "Essential Eight assessments against ASD's maturity model, a prioritised roadmap, and the controls implemented to reach your target level.",
+})
+INCLUDED_INTRO.update({
+ "ai-automation": "An automation is only useful if it keeps running when the inputs get messy. Every engagement covers the build, the guardrails and the operation afterwards.",
+ "essential-eight": "An Essential Eight assessment is only as useful as the evidence behind it and the work it leads to. Every engagement covers both.",
+})
+HOW_INTRO.update({
+ "ai-automation": "We start small and measurable: one workflow, real examples, a person checking the output, then wider rollout once the numbers hold.",
+ "essential-eight": "ASD's guidance is to bring all eight strategies to the same maturity level before aiming higher. Our roadmap follows that, so effort goes where it lifts your overall level.",
+})
+PLATFORM_INTRO.update({
+ "ai-automation": "We build on the platform you already use where possible, so your data stays in your accounts and the automation sits inside your existing security controls.",
+ "essential-eight": "Most Essential Eight controls live in Windows, Microsoft 365 and your identity provider. We implement them with the tools you already license, and extend equivalent controls to your cloud workloads.",
+})
+RELATED_INTRO.update({
+ "ai-automation": "Automations depend on the systems and data underneath them. These are the services that keep them secure and reliable.",
+ "essential-eight": "The Essential Eight sits alongside broader security and compliance work. These services are the usual companions.",
+})
+
 # ---------------------------------------------------------------- file writer
 def write(path, content):
     if path.endswith("/"):
@@ -447,7 +478,7 @@ def stub(old_path, new_path, name):
     os.makedirs(os.path.dirname(fs) or ".", exist_ok=True)
     with open(fs, "w", encoding="utf-8") as f:
         f.write(f'''<!DOCTYPE html>
-<html lang="en">
+<html lang="en-AU">
 <head>
 <meta charset="utf-8">
 <title>{html.escape(name)} | Orbit3</title>
@@ -470,9 +501,9 @@ def stub(old_path, new_path, name):
 # ---------- CloudOps Managed Services
 service_page(
  slug="cloudops-managed-services",
- title="CloudOps Managed Services: 24/7 AWS, Azure & GCP | Orbit3",
- desc="Managed cloud services from Orbit3: 24/7 monitoring, patching, security, backup and cost control for AWS, Azure and Google Cloud, with one accountable team.",
- h1="CloudOps Managed Services <span class=\"text-gradient\">that never sleep</span>",
+ title="Managed Cloud Services Sydney: 24/7 CloudOps | Orbit3",
+ desc="Managed cloud services in Sydney and across Australia: 24/7 monitoring, patching, security, backup and cost control for AWS, Azure and Google Cloud.",
+ h1="Managed cloud services <span class=\"text-gradient\">that never sleep</span>",
  lede="Your cloud environment, proactively monitored, secured, patched and cost-managed by us. One accountable partner instead of a rota of part-time attention.",
  eyebrow="Managed cloud services",
  h2="24/7 cloud management for AWS, Azure and Google Cloud",
@@ -550,7 +581,7 @@ AI_TRAIN = [
  ("ep", "epoch 2/4  loss 0.947  eval 78.9%"),
  ("ep", "epoch 3/4  loss 0.412  eval 88.6%"),
  ("ep", "epoch 4/4  loss 0.236  eval 93.1%"),
- ("ok", "✓ ops-copilot deployed · eu-west-2"),
+ ("ok", "✓ ops-copilot deployed · ap-southeast-2"),
 ]
 AI_DEMO = [
  {"q": "Why did our AWS bill jump last week?",
@@ -586,9 +617,9 @@ def ai_lab():
 
 service_page(
  slug="ai-solutions",
- title="AI Consulting & LLM Implementation Services | Orbit3",
- desc="AI consulting and implementation from Orbit3: custom LLM applications, RAG, workflow automation and AI agents, built on secure foundations and run for you.",
- h1="AI Solutions that ship <span class=\"text-gradient\">and keep working</span>",
+ title="AI Consulting Sydney: LLM & Automation Services | Orbit3",
+ desc="AI consulting in Sydney and across Australia: custom LLM applications, RAG, AI agents and workflow automation, built on secure foundations and run for you.",
+ h1="AI consulting that ships <span class=\"text-gradient\">and keeps working</span>",
  lede="We design, build and run custom AI for your business, from LLM-powered applications to workflow automation and AI agents, with the same managed-service rigour we bring to the cloud.",
  eyebrow="AI consulting and implementation",
  h2="Custom LLM applications, RAG and AI agents that reach production",
@@ -599,7 +630,7 @@ service_page(
  ],
  bullets=[
   ("Custom AI &amp; LLM applications", "Retrieval-augmented generation, copilots and assistants grounded in your own data."),
-  ("Workflow automation &amp; agents", "Automations and agents that take real action across your systems, with human oversight built in."),
+  ("Workflow automation &amp; agents", "Automations and agents that take real action across your systems, with human oversight built in. See <a href=\"/Services/ai-automation/\">AI automation</a>."),
   ("Secure by design", "Your data stays in your cloud account, with access controls and audit trails from day one."),
   ("Run as a managed service", "Evaluation, monitoring, cost tracking and model updates handled after launch."),
  ],
@@ -648,7 +679,7 @@ service_page(
   ("Do we need a data science team?", "No. We handle the engineering. What we need from you is access to the people who do the work today, because they know which answers are right."),
   ("What happens after launch?", "The system is monitored, secured and improved as a managed service: model updates, prompt and retrieval tuning, cost tracking and new capabilities. You are not left holding a prototype."),
  ],
- rel=["cloudops-managed-services", "cloud-security", "cloud-devops"],
+ rel=["ai-automation", "cloudops-managed-services", "cloud-security"],
  cta={"eyebrow": "Get started", "h2": "Have an AI idea? Let's pressure-test it.", "p": "Book a free 30-minute scoping call. We'll tell you whether AI is the right tool, where it pays off first, and what it would take to ship.", "btn": "Book a free scoping call"},
  service_type="AI consulting and implementation",
  hero_bg='<div class="hero-3d" aria-hidden="true"></div>',
@@ -658,9 +689,9 @@ service_page(
 # ---------- Cloud Adoption
 service_page(
  slug="cloud-adoption",
- title="Cloud Migration & Adoption Consulting | Orbit3",
- desc="Cloud migration consulting from Orbit3: workload assessment, target architecture and a phased migration to AWS, Azure or Google Cloud with no big-bang cut-over.",
- h1="Move to the cloud <span class=\"text-gradient\">with confidence</span>",
+ title="Cloud Migration Services Sydney & Australia | Orbit3",
+ desc="Cloud migration services in Sydney and Australia: workload assessment, target architecture and a phased migration to AWS, Azure or Google Cloud.",
+ h1="Cloud migration <span class=\"text-gradient\">without the big-bang cut-over</span>",
  lede="A practical, purpose-built migration plan, assessed, designed and delivered by consultants who will still be around to run it afterwards.",
  eyebrow="Cloud migration and adoption",
  h2="A migration plan built around your workloads, not a template",
@@ -720,9 +751,9 @@ service_page(
 # ---------- Cloud Security
 service_page(
  slug="cloud-security",
- title="Cloud Security Assessment & Compliance Services | Orbit3",
- desc="Cloud security services from Orbit3: configuration reviews, risk assessments, hardened controls and compliance mapping for AWS, Azure and Google Cloud.",
- h1="Cloud security <span class=\"text-gradient\">you can prove</span>",
+ title="Cloud Security Services & Assessments Sydney | Orbit3",
+ desc="Cloud security services for Australian businesses: configuration reviews, risk assessments, hardened controls and compliance mapping on AWS, Azure and GCP.",
+ h1="Cloud security services <span class=\"text-gradient\">you can prove</span>",
  lede="We review your cloud security controls, run risk assessments, and build best-practice target-state controls that meet your compliance requirements and hold up under scrutiny.",
  eyebrow="Cloud security services",
  h2="Cloud security reviews, risk assessments and compliance controls",
@@ -734,14 +765,14 @@ service_page(
   ("Configuration and posture review", "Every account, role, network path and storage location, against a recognised benchmark."),
   ("Risk assessment", "Findings ranked by what an attacker could actually do with them, not by tool severity."),
   ("Target-state controls", "Identity, network, data protection, logging and detection designed and implemented."),
-  ("Compliance mapping", "Controls mapped to ISO 27001, SOC 2, Cyber Essentials or the framework your customers ask about. Working towards SOC 2 in Vanta? See our <a href=\"/Services/soc2-compliance/\">SOC 2 remediation service</a>."),
+  ("Compliance mapping", "Controls mapped to ISO 27001, SOC 2, the <a href=\"/Services/essential-eight/\">Essential Eight</a> or the framework your customers ask about. Working towards SOC 2 in Vanta? See our <a href=\"/Services/soc2-compliance/\">SOC 2 remediation service</a>."),
  ],
- panel=glance([("Starts with", "Posture review"), ("Output", "Ranked findings + remediation plan"), ("Frameworks", "CIS · ISO 27001 · SOC 2 · Cyber Essentials"), ("Afterwards", "Controls maintained under managed services")]),
+ panel=glance([("Starts with", "Posture review"), ("Output", "Ranked findings + remediation plan"), ("Frameworks", "CIS · ISO 27001 · SOC 2 · Essential Eight"), ("Afterwards", "Controls maintained under managed services")]),
  who={"h2": "For businesses that have to answer a security questionnaire, or should",
       "p": "The trigger is usually external: a customer's due diligence, an insurer's questions, an audit date, or an incident somewhere similar.",
       "cards": [
         {"icon": "people", "h": "Vendors selling to larger customers", "p": "Enterprise procurement wants evidence of your controls. You need to be able to show them, not describe them."},
-        {"icon": "shield", "h": "Regulated or certifying organisations", "p": "You are working towards ISO 27001, SOC 2 or Cyber Essentials and the cloud environment is the part nobody is sure about."},
+        {"icon": "shield", "h": "Regulated or certifying organisations", "p": "You are working towards ISO 27001, SOC 2 or the Essential Eight and the cloud environment is the part nobody is sure about."},
         {"icon": "refresh", "h": "Teams that grew faster than their controls", "p": "Access was granted as needed and never reviewed. You would like to know what is actually exposed before someone else finds out."},
       ]},
  included=[
@@ -769,7 +800,7 @@ service_page(
  faqs=[
   ("Is this a penetration test?", "No. A penetration test tries to break in from the outside. A cloud security assessment reviews how the environment is configured from the inside, which is where most cloud breaches actually start. The two complement each other, and we can coordinate with a testing provider if you need both."),
   ("Will the assessment disrupt our environment?", "The review is read-only. Remediation involves changes, which we plan with you, make through version-controlled infrastructure code where possible, and schedule around your business."),
-  ("Which compliance frameworks do you work with?", "Most commonly ISO 27001, SOC 2 and Cyber Essentials, plus the platform benchmarks from CIS and the cloud providers themselves. If your customers ask about a specific framework, we map to that."),
+  ("Which compliance frameworks do you work with?", "Most commonly ISO 27001, SOC 2 and the Essential Eight, plus the platform benchmarks from CIS and the cloud providers themselves. If your customers ask about a specific framework, we map to that."),
   ("How long does an assessment take?", "A single-account environment can be assessed in days; a multi-account estate takes a few weeks. Remediation time depends on what we find and how much of it you want us to fix versus your own team."),
   ("Do you fix the problems or just report them?", "Both. The report is written so your team could act on it alone, and we are equally happy to implement the fixes ourselves. Most clients ask us to handle the high-risk items immediately and work through the rest together."),
   ("What keeps the environment secure afterwards?", "Controls drift as people and systems change. Our managed service maintains and evidences them every month; otherwise we recommend a re-assessment at least annually or after any major change."),
@@ -782,9 +813,9 @@ service_page(
 # ---------- Cloud Optimisation
 service_page(
  slug="cloud-optimisation",
- title="Cloud Cost Optimisation & FinOps Services | Orbit3",
- desc="Cloud cost optimisation and FinOps from Orbit3: spend analysis, right-sizing, commitment planning and governance that cut your cloud bill and keep it down.",
- h1="Stop overpaying <span class=\"text-gradient\">for your cloud</span>",
+ title="Cloud Cost Optimisation & FinOps Australia | Orbit3",
+ desc="Cloud cost optimisation and FinOps for Australian businesses: spend analysis, right-sizing, commitment planning and governance that cut your cloud bill.",
+ h1="Cloud cost optimisation <span class=\"text-gradient\">that stops the overspend</span>",
  lede="Control public-cloud spend and get full transparency over costs, with inefficiencies corrected and the governance to stop them coming back baked into your pipeline.",
  eyebrow="Cloud cost optimisation",
  h2="Cut cloud spend without cutting performance",
@@ -844,9 +875,9 @@ service_page(
 # ---------- Cloud DevOps
 service_page(
  slug="cloud-devops",
- title="Cloud DevOps & CI/CD Consulting Services | Orbit3",
- desc="DevOps consulting from Orbit3: CI/CD pipelines, Terraform infrastructure as code, containers and observability so your team ships faster and more reliably.",
- h1="Ship faster, <span class=\"text-gradient\">more reliably</span>",
+ title="DevOps Consulting Sydney: Cloud CI/CD Services | Orbit3",
+ desc="DevOps consulting in Sydney and Australia: CI/CD pipelines, Terraform infrastructure as code, containers and observability so your team ships faster.",
+ h1="DevOps consulting to ship <span class=\"text-gradient\">faster, more reliably</span>",
  lede="Automated, repeatable delivery pipelines and infrastructure as code that let your team release routinely, with quality and security built in from the start.",
  eyebrow="DevOps consulting",
  h2="Infrastructure as code and delivery pipelines that ship daily",
@@ -906,9 +937,9 @@ service_page(
 # ---------- Cloud Backup
 service_page(
  slug="cloud-backup",
- title="Cloud Backup & Disaster Recovery Services | Orbit3",
- desc="Cloud backup and disaster recovery from Orbit3: recovery objectives agreed, backups automated and isolated, restores tested and runbooks written.",
- h1="Recover quickly <span class=\"text-gradient\">when it matters</span>",
+ title="Cloud Backup & Disaster Recovery Services Sydney | Orbit3",
+ desc="Cloud backup and disaster recovery for Australian businesses: recovery objectives agreed, backups automated and isolated, restores tested, runbooks written.",
+ h1="Cloud backup and disaster recovery <span class=\"text-gradient\">for when it matters</span>",
  lede="Resilient backup and disaster recovery that protects your business from data loss and downtime, designed around what you can afford to lose and tested so restores are routine.",
  eyebrow="Backup and disaster recovery",
  h2="Backup and disaster recovery you have actually tested",
@@ -966,11 +997,33 @@ service_page(
 )
 
 
+# ---------- SOC 2 in Australia (extra section on the SOC 2 page)
+SOC2_AU = f'''
+<section class="section">
+  <div class="container split" style="align-items:start">
+    <div class="reveal">
+      <span class="eyebrow">SOC 2 in Australia</span>
+      <h2>SOC 2 compliance for Australian companies</h2>
+      <p>SOC 2 is an American standard, set by the AICPA, but it has become the security report enterprise buyers everywhere ask for. Australian SaaS and technology companies usually meet it when they start selling into the United States, or when a large local customer's procurement team sends the same questionnaire it sends to global vendors.</p>
+      <p>The audit itself has to be performed by an independent, licensed CPA firm. Some Australian accounting firms offer SOC 2 through CPA-licensed partners, and US firms routinely audit Australian companies remotely. Choosing the auditor is rarely the hard part; getting the controls in place and keeping them operating is.</p>
+      <p>We work with Australian teams on Sydney time, alongside the frameworks they often need at the same time: ISO 27001 for international customers, the <a href="/Services/essential-eight/" style="color:var(--accent)">Essential Eight</a> for government work, and the Australian Privacy Principles if you include the SOC 2 Privacy criteria. Not sure which report to aim for? Read <a href="/insights/soc-2-type-1-vs-type-2/" style="color:var(--accent)">SOC 2 Type 1 vs Type 2</a>.</p>
+    </div>
+    <ul class="checklist checklist--grid reveal">
+      <li>{I["check"]}<span><strong>Sydney time zone</strong>Working sessions, auditor calls and fixes during Australian business hours.</span></li>
+      <li>{I["check"]}<span><strong>Auditor-agnostic</strong>We work with Australian and US audit firms and help you shortlist one that fits your timeline.</span></li>
+      <li>{I["check"]}<span><strong>One set of controls</strong>Mapped once across SOC 2, ISO 27001 and the Essential Eight.</span></li>
+      <li>{I["check"]}<span><strong>Australian data residency</strong>Logs, backups and evidence kept in Australian cloud regions where customers require it.</span></li>
+      <li>{I["check"]}<span><strong>APRA-regulated customers</strong>Evidence packaged for customers who assess their suppliers under CPS 234.</span></li>
+      <li>{I["check"]}<span><strong>Type I to Type II</strong>A path that unblocks deals early and starts the observation window straight away.</span></li>
+    </ul>
+  </div>
+</section>'''
+
 # ---------- SOC 2 Compliance & Remediation
 service_page(
  slug="soc2-compliance",
- title="SOC 2 Remediation & Compliance Services (Vanta) | Orbit3",
- desc="SOC 2 remediation from Orbit3: we fix the failing tests in Vanta, implement the technical and organisational controls, and keep them green through the audit.",
+ title="SOC 2 Compliance Australia: Vanta Remediation | Orbit3",
+ desc="SOC 2 compliance for Australian companies: we fix the failing tests in Vanta, implement the controls and keep them green through the audit.",
  h1="SOC 2 compliance <span class=\"text-gradient\">without the scramble</span>",
  lede="Vanta shows you the gaps. We close them: cloud controls, policies, evidence and the operational discipline to stay audit-ready through the observation window and beyond.",
  eyebrow="SOC 2 remediation services",
@@ -1023,6 +1076,8 @@ service_page(
   ("Type I or Type II?", "Type I reports on the design of your controls at a point in time; Type II reports on whether they operated effectively over a period. Most enterprise customers ultimately want Type II. A common path is to remediate, obtain a Type I to unblock deals, and start the Type II observation window immediately afterwards."),
   ("Can you work with our auditor?", "Yes. We set up auditor access in Vanta, organise the evidence the way audit firms expect, and join the calls where technical questions come up. We do not perform the audit itself; that has to be an independent CPA firm."),
   ("What happens after the report?", "SOC 2 is annual, and controls drift the moment nobody is watching. Under our managed service the Vanta tests are monitored, recurring tasks such as access reviews and restore tests happen on schedule, and drift is fixed as it appears, so the next observation window is uneventful."),
+  ("Is SOC 2 recognised in Australia?", "Yes. SOC 2 is a US standard from the AICPA, but Australian enterprises and almost every US customer accept it as evidence of a supplier's security controls. Australian companies often pair it with ISO 27001 or the Essential Eight, depending on who they sell to."),
+  ("Can an Australian company get a SOC 2 report?", "Yes. Any service organisation can be audited, wherever it is based. The auditor must be an independent CPA firm licensed to issue SOC reports; some Australian firms offer this through CPA-licensed partners, and US firms routinely audit Australian companies remotely."),
  ],
  rel=["cloud-security", "cloudops-managed-services", "cloud-backup"],
  cta={"eyebrow": "Get started", "h2": "Staring at a red Vanta dashboard?", "p": "Book a free 30-minute call. Share your screen, and we'll tell you which failing tests matter, which are quick, and how long a realistic remediation would take.", "btn": "Book a free SOC 2 triage call"},
@@ -1046,7 +1101,134 @@ service_page(
       <li>{I["check"]}<span><strong>Continuous monitoring</strong>Failing tests caught and fixed as part of managed operations.</span></li>
     </ul>
   </div>
-</section>''',
+</section>''' + SOC2_AU,
+)
+
+# ---------- AI Automation & Agents
+service_page(
+ slug="ai-automation",
+ title="AI Automation Sydney: Workflows & AI Agents | Orbit3",
+ desc="AI automation for Australian businesses: AI agents that take repetitive work off your team across email, documents, CRM, finance and support.",
+ h1="AI automation <span class=\"text-gradient\">that takes work off your team</span>",
+ lede="We find the repetitive, rules-heavy work your people do every week, automate it with AI agents and workflow tools, and keep the automations running as a managed service.",
+ eyebrow="AI automation agency",
+ h2="Business process automation with AI agents that act, not just answer",
+ intro_paras=[
+  "Every business carries the same hidden cost: skilled people spending hours a week copying data between systems, triaging inboxes, chasing approvals, reconciling invoices and writing the same updates. Traditional automation handled the steps that never vary. AI agents can now handle the ones that do: reading an email, understanding a document, deciding which system it belongs in, and taking the next step.",
+  "Orbit3 designs and builds those automations around your existing tools, with a person approving anything that matters. We start with the workflow that will pay back fastest, measure the hours it saves, and then run it alongside our <a href=\"/Services/ai-solutions/\">AI consulting and implementation</a> work, so it keeps working when your systems, staff or volumes change.",
+ ],
+ bullets=[
+  ("Workflow discovery", "We map the process as it really runs today and put a number on the hours it costs."),
+  ("AI agents with guardrails", "Agents that read, decide and act across your systems, with approval steps where the stakes require them."),
+  ("Built on your tools", "Microsoft 365, Google Workspace, HubSpot, Salesforce, Xero, Zendesk, Slack and your own APIs."),
+  ("Measured payback", "Hours saved, error rates and cost per run tracked from the first week."),
+  ("Run as a managed service", "Monitoring, fixes and improvements handled after launch, not left to whoever built it."),
+ ],
+ panel=glance([("Starts with", "One workflow, costed"), ("First build", "Weeks, not months"), ("Oversight", "Human approval where it matters"), ("Afterwards", "Monitored and improved for you")]),
+ who={"h2": "For teams buried in work a machine could do",
+      "p": "The best automation candidates are unglamorous: high volume, repetitive, rules-heavy, and currently done by someone who would rather be doing something else.",
+      "cards": [
+        {"icon": "mail", "h": "Inbox- and document-heavy operations", "p": "Orders, enquiries, invoices, applications and forms arrive by email or PDF and get keyed into another system by hand. An agent can read, extract, check and file them."},
+        {"icon": "people", "h": "Sales and service teams doing admin", "p": "CRM updates, call notes, follow-ups and ticket triage eat into time that should go to customers. Automation keeps the records current without the typing."},
+        {"icon": "chart", "h": "Finance and reporting workloads", "p": "Reconciliations, approvals, month-end packs and recurring reports that follow the same steps every time, with the same mistakes when people are rushed."},
+      ]},
+ included=[
+  ("Process discovery and costing", "Time with the people who do the work, every step mapped, and the hours and error cost estimated, so we automate what pays back first."),
+  ("Automation design", "Which steps fixed rules handle, which need an AI model and where a person approves, written down before anything is built."),
+  ("AI agents", "Agents that read emails and documents, classify and extract what matters, call your systems' APIs and hand off to a person when unsure."),
+  ("Document processing", "Invoices, purchase orders, contracts and forms turned into structured data, checked against your rules and posted to the right system."),
+  ("Integrations", "Connections to Microsoft 365, Google Workspace, CRMs, accounting, helpdesk and messaging tools through official APIs and least-privilege access."),
+  ("Low-code or custom, whichever fits", "n8n, Power Automate, Make or Zapier for simple flows; custom code in your own cloud account for anything that needs more control, scale or security."),
+  ("Human-in-the-loop controls", "Approval queues, confidence thresholds and audit logs, so nothing irreversible happens without the right person seeing it."),
+  ("Monitoring and error handling", "Every run logged, failures alerted and retried, and a regular view of volumes, hours saved and exceptions."),
+  ("Ongoing improvement", "New edge cases handled, prompts and rules tuned, and the next workflow added once the first is paying for itself."),
+ ],
+ how_h2="Find, automate, run",
+ how_steps=[
+  ("Find", "A free call and a short discovery to pick the workflow with the clearest payback. You get the process map and the hours it costs whether or not you continue."),
+  ("Automate", "We build against real examples from your business, test alongside the people who do the work today, and switch the automation on in stages."),
+  ("Run", "We monitor every run, handle the exceptions and improve the automation as your volumes and systems change, then help you pick the next workflow."),
+ ],
+ platforms=[
+  ("Amazon Web Services", "Amazon Bedrock models and agents, Lambda and Step Functions for orchestration, Textract for document extraction, and EventBridge to react to events across your systems."),
+  ("Microsoft Azure", "Azure OpenAI Service, Power Automate and Logic Apps, Azure AI Document Intelligence, and Microsoft Graph for Outlook, Teams and SharePoint, governed by Entra ID."),
+  ("Google Cloud", "Gemini on Vertex AI, Document AI, Cloud Run and Workflows for orchestration, and the Google Workspace APIs for Gmail, Drive and Sheets."),
+ ],
+ faqs=[
+  ("What is an AI automation agency?", "A team that builds automations using AI models alongside traditional workflow tools, so processes that need judgement, such as reading an email or a document, can be automated rather than just the fixed steps. Orbit3 builds those automations and then runs them for you as a managed service."),
+  ("What kinds of processes can be automated?", "Anything high-volume and repetitive with clear rules for what good looks like: email and enquiry triage, invoice and document processing, CRM and helpdesk updates, approvals, onboarding steps, report generation and data entry between systems. Work that needs genuine judgement on every case is a poor first candidate."),
+  ("What is the difference between an AI agent and normal automation?", "Normal automation follows fixed rules: if this field says X, do Y. An AI agent can interpret unstructured input such as an email, a PDF or a conversation, decide which steps to take and call the tools to take them. The most reliable automations combine both: fixed rules for what is predictable and AI for what is not."),
+  ("Will the automation make mistakes?", "Occasionally, as people do. We design for it: confidence thresholds that send uncertain cases to a person, validation against your business rules, approval before anything irreversible, and a log of every decision so mistakes are caught and corrected."),
+  ("Do you use tools like n8n, Make or Zapier?", "Yes, where they fit. Low-code tools are quick and inexpensive for simple flows. For workflows that handle sensitive data, run at volume or need custom logic, we build in your own cloud account so you keep control of the data and the cost."),
+  ("How quickly will we see a return?", "We choose the first workflow on payback, so most clients see hours saved within weeks of go-live. Discovery puts a number on the expected saving before you commit to the build."),
+ ],
+ rel=["ai-solutions", "cloudops-managed-services", "cloud-security"],
+ cta={"eyebrow": "Get started", "h2": "What would you automate first?", "p": "Book a free 30-minute call. Bring the process that eats the most hours and we'll tell you whether it can be automated, how, and what it would save.", "btn": "Book a free automation call"},
+ service_type="AI automation and workflow automation",
+)
+
+# ---------- Essential Eight
+service_page(
+ slug="essential-eight",
+ title="Essential Eight Assessment & Compliance, Sydney | Orbit3",
+ desc="Essential Eight assessment and uplift: your maturity assessed against ASD's model, gaps prioritised, and controls implemented to reach your target.",
+ h1="Essential Eight compliance <span class=\"text-gradient\">you can evidence</span>",
+ lede="We assess your environment against the ASD Essential Eight Maturity Model, show you exactly where you sit on each of the eight strategies, and implement the controls to reach the maturity level you need.",
+ eyebrow="Essential Eight assessment and uplift",
+ h2="Essential Eight assessments, roadmaps and implementation",
+ intro_paras=[
+  "The Essential Eight is the Australian Signals Directorate's baseline set of mitigation strategies against cyber threats: patch applications, patch operating systems, multi-factor authentication, restrict administrative privileges, application control, restrict Microsoft Office macros, user application hardening and regular backups. Commonwealth entities are required to implement it, and it increasingly appears in government tenders, enterprise supplier questionnaires and cyber insurance renewals.",
+  "Orbit3 tests where you actually sit against each strategy using ASD's maturity model, rather than a self-assessment spreadsheet, then builds a prioritised roadmap and implements the controls with your team. The work overlaps heavily with good <a href=\"/Services/cloud-security/\">cloud security</a> and day-to-day <a href=\"/Services/cloudops-managed-services/\">managed IT and cloud operations</a>, so once you reach your target level we can keep you there.",
+  "New to the maturity levels? Read <a href=\"/insights/essential-eight-maturity-levels/\">Essential Eight maturity levels explained</a>.",
+ ],
+ bullets=[
+  ("Maturity assessment", "Each of the eight strategies tested against ASD's maturity model, with the evidence recorded."),
+  ("Gap report and roadmap", "What stands between you and your target maturity level, ranked by risk and effort."),
+  ("Implementation", "Patching, MFA, privileged access, application control, macro and hardening policies, and backups put in place."),
+  ("Ongoing evidence", "Controls monitored and re-assessed so your maturity level holds after the project ends."),
+ ],
+ panel=glance([("Framework", "ASD Essential Eight Maturity Model"), ("Target levels", "One · Two · Three"), ("Output", "Maturity per strategy + roadmap"), ("Afterwards", "Controls maintained under managed services")]),
+ who={"h2": "For organisations that have been asked about the Essential Eight",
+      "p": "The question usually arrives from outside: a government tender, a customer's security questionnaire, an insurer, or a board member who read about a breach.",
+      "cards": [
+        {"icon": "map", "h": "Suppliers to government", "p": "Agencies have to meet the Essential Eight themselves and increasingly ask the same of their suppliers. You need a credible maturity statement and the evidence behind it."},
+        {"icon": "shield", "h": "Businesses renewing cyber insurance", "p": "The insurer's questionnaire asks about MFA, patching, admin rights and backups. Answering confidently and accurately affects both cover and premium."},
+        {"icon": "people", "h": "Growing companies without a security team", "p": "IT grew one laptop and one admin account at a time. You want an honest baseline and a plan that fits a business your size."},
+      ]},
+ included=[
+  ("Scoping", "Which systems, users and environments are in scope, your target maturity level, and who needs the result, from the board to a customer."),
+  ("Technical assessment", "Each strategy tested on real endpoints, servers and identities, following ASD's assessment approach rather than relying on policy statements."),
+  ("Maturity statement", "Your assessed maturity level for each of the eight strategies, with the evidence and the specific requirements not yet met."),
+  ("Prioritised roadmap", "Gaps ranked by risk reduction and effort, sequenced so all eight strategies reach the same level before you aim higher."),
+  ("Patching and vulnerability management", "Automated patching of operating systems and applications within ASD's timeframes, with scanning to prove it."),
+  ("Identity and privileged access", "Multi-factor authentication, phishing-resistant where required, separate privileged accounts and time-limited administration."),
+  ("Application control and hardening", "Application control policies, Office macro restrictions, browser and application hardening, and the logging the higher levels require."),
+  ("Backups", "Important data, software and settings backed up, protected from change or deletion and tested by restoring. See our <a href=\"/Services/cloud-backup/\">cloud backup service</a>."),
+  ("Re-assessment and reporting", "A follow-up assessment once the work is done, and a plain-English report you can hand to a customer, insurer or board."),
+ ],
+ how_h2="Assess, uplift, maintain",
+ how_steps=[
+  ("Assess", "We test each strategy against the maturity model and give you an evidenced maturity level per strategy, plus the gap list. You keep the report whether or not you continue."),
+  ("Uplift", "We implement the controls in priority order with your team, using Microsoft Intune, Defender, Entra ID and the tooling you already pay for wherever possible."),
+  ("Maintain", "Controls are monitored, exceptions reviewed and evidence kept current under managed services, with a re-assessment at least annually."),
+ ],
+ platforms=[
+  ("Windows and Microsoft 365", "Intune for patching and configuration, Defender for Endpoint, Entra ID Conditional Access and Privileged Identity Management, App Control for Business and AppLocker, and Office macro policy. This is where most of the Essential Eight lives."),
+  ("Microsoft Azure", "Azure Update Manager, Defender for Cloud, Azure Policy and Azure Backup for servers and workloads running in Azure, with privileged roles managed through PIM."),
+  ("AWS and Google Cloud", "Systems Manager Patch Manager and AWS Backup, or Google Cloud's VM Manager and Backup and DR, with MFA enforced through your identity provider. ASD designed the Essential Eight for Windows networks, so cloud workloads often need equivalent controls rather than a literal match."),
+ ],
+ platforms_h2="Windows, Microsoft 365 and the cloud",
+ faqs=[
+  ("What is the Essential Eight?", "A set of eight mitigation strategies published by the Australian Signals Directorate (ASD) as a baseline against cyber threats: patch applications, patch operating systems, multi-factor authentication, restrict administrative privileges, application control, restrict Microsoft Office macros, user application hardening and regular backups. The accompanying maturity model defines what each strategy looks like at Maturity Levels One to Three."),
+  ("Which maturity level do we need?", "It depends on who is asking. Non-corporate Commonwealth entities must reach Maturity Level Two under the Protective Security Policy Framework, and many government tenders and enterprise customers ask suppliers for the same. For most private businesses, Maturity Level One across all eight strategies is the sensible first target, with Level Two where the threat or the contract warrants it."),
+  ("Can we get Essential Eight certified?", "There is no formal Essential Eight certification. What you can have is an assessment against ASD's maturity model that states your maturity level for each strategy, with the evidence behind it. That is what customers, insurers and boards usually want to see."),
+  ("Does the Essential Eight apply to cloud and SaaS?", "ASD designed the Essential Eight to protect Microsoft Windows-based, internet-connected networks. Cloud services, Linux servers and SaaS platforms still need equivalent protections such as MFA, patching, least privilege and backups, and we assess and implement those alongside the eight strategies rather than forcing a literal fit."),
+  ("How long does an Essential Eight uplift take?", "The assessment takes days to a couple of weeks, depending on size. Reaching Maturity Level One is commonly a matter of weeks; Level Two usually takes months, because application control and privileged access changes need careful rollout. The roadmap gives you a realistic timeline for your environment."),
+  ("How does the Essential Eight relate to ISO 27001 or SOC 2?", "They overlap. The Essential Eight is a prescriptive technical baseline; ISO 27001 and SOC 2 are broader frameworks that expect controls like these to exist. Work done for one counts towards the others, and we map it so you only do it once."),
+ ],
+ rel=["cloud-security", "soc2-compliance", "cloudops-managed-services"],
+ cta={"eyebrow": "Get started", "h2": "Been asked about your Essential Eight maturity?", "p": "Book a free 30-minute call. We'll ask a few questions about your environment, give you an honest view of where you're likely to sit, and outline what an assessment would involve.", "btn": "Book a free Essential Eight call"},
+ service_type="Essential Eight assessment and implementation",
 )
 
 # =====================================================================================
@@ -1060,8 +1242,8 @@ def services_index():
             "hasPart": [{"@type": "Service", "name": n, "url": SITE + SURL[s]} for s, n in SERVICES]}
     website = {"@type": "WebSite", "@id": f"{SITE}/#website", "url": f"{SITE}/", "name": "Orbit3", "publisher": {"@id": f"{SITE}/#organization"}}
     spec = ""
-    for s in ["cloud-adoption", "cloud-security", "soc2-compliance", "cloud-optimisation", "cloud-devops", "cloud-backup"]:
-        icon = {"cloud-adoption": "map", "cloud-security": "lock", "soc2-compliance": "shield", "cloud-optimisation": "coins", "cloud-devops": "rocket", "cloud-backup": "server"}[s]
+    for s in ["ai-automation", "cloud-adoption", "cloud-security", "soc2-compliance", "essential-eight", "cloud-optimisation", "cloud-devops", "cloud-backup"]:
+        icon = {"ai-automation": "bolt", "cloud-adoption": "map", "cloud-security": "lock", "soc2-compliance": "shield", "essential-eight": "badge", "cloud-optimisation": "coins", "cloud-devops": "rocket", "cloud-backup": "server"}[s]
         spec += f'<div class="card card--feature reveal"><span class="card-icon">{I[icon]}</span><h3><a href="{SURL[s]}">{SNAME[s]}</a></h3><p>{BLURB[s]}</p><a class="link-arrow" href="{SURL[s]}">Learn more {I["arrow"]}</a></div>'
     if False: spec += f'<div class="card card--feature reveal"><span class="card-icon">{I["people"]}</span><h3>Not sure where to start?</h3><p>Tell us what&#39;s slowing you down and we&#39;ll point you to the right starting place, honestly, even if that&#39;s not us.</p><a class="link-arrow" href="{CAL}" target="_blank" rel="noopener noreferrer">Book a call {I["arrow"]}</a></div>'
     body = f'''<section class="page-hero center">
@@ -1069,7 +1251,7 @@ def services_index():
   <div class="hero-grid-overlay" aria-hidden="true"></div>
   <div class="container">
     {crumb_html}
-    <h1 class="measure">One partner for running your tech <span class="text-gradient">and building your AI</span></h1>
+    <h1 class="measure">Cloud and AI consulting services <span class="text-gradient">from one accountable partner</span></h1>
     <p class="lede measure">Managed cloud services, AI consulting and the specialist cloud work around them. We keep your cloud and IT operations secure, reliable and cost-efficient, and build the AI and automation that move your business forward.</p>
     {cta_buttons()}
   </div>
@@ -1085,7 +1267,7 @@ def services_index():
 </section>
 <section class="section section--alt">
   <div class="container">
-    <div class="center measure" style="margin-bottom:44px"><span class="eyebrow eyebrow--center">Specialist cloud services</span><h2>Targeted help where you need it</h2><p>Engage any of these on their own, or as part of a managed-services relationship.</p></div>
+    <div class="center measure" style="margin-bottom:44px"><span class="eyebrow eyebrow--center">Specialist services</span><h2>Targeted help where you need it</h2><p>Engage any of these on their own, or as part of a managed-services relationship.</p></div>
     <div class="grid grid-3">{spec}</div>
   </div>
 </section>
@@ -1102,8 +1284,8 @@ def services_index():
 </section>
 {cta_band("Get started", "Tell us what you're trying to fix", "One free call is the fastest way to know whether we can help. We'll listen, give you a straight answer, and outline what a first step would look like.")}
 '''
-    write(path, head(path, "Cloud & AI Consulting Services | Orbit3",
-                     "Managed cloud services, AI consulting, cloud migration, security, cost optimisation, DevOps and backup from Orbit3. One accountable partner for tech and AI.",
+    write(path, head(path, "Cloud & AI Consulting Services in Sydney | Orbit3",
+                     "Managed cloud, AI consulting and automation, SOC 2, Essential Eight, security, migration, FinOps, DevOps and backup from one Sydney-based partner.",
                      [ORG, website, coll, crumb_ld]) + header(path) + body + footer())
 services_index()
 
@@ -1114,7 +1296,7 @@ def home():
     path = "/"
     website = {"@type": "WebSite", "@id": f"{SITE}/#website", "url": f"{SITE}/", "name": "Orbit3", "publisher": {"@id": f"{SITE}/#organization"}}
     grid = ""
-    icons = {"cloudops-managed-services": "cloud", "ai-solutions": "robot", "cloud-adoption": "map", "cloud-security": "lock", "soc2-compliance": "shield", "cloud-optimisation": "coins", "cloud-devops": "rocket", "cloud-backup": "server"}
+    icons = {"cloudops-managed-services": "cloud", "ai-solutions": "robot", "cloud-adoption": "map", "cloud-security": "lock", "soc2-compliance": "shield", "cloud-optimisation": "coins", "cloud-devops": "rocket", "cloud-backup": "server", "ai-automation": "bolt", "essential-eight": "badge"}
     for s, n in SERVICES:
         grid += f'<a class="card card--link reveal" href="{SURL[s]}"><span class="card-icon">{I[icons[s]]}</span><h3>{n}</h3><p>{BLURB[s]}</p><span class="link-arrow">Learn more {I["arrow"]}</span></a>'
     if False: grid += f'<a class="card card--link card--primary reveal" href="{CAL}" target="_blank" rel="noopener noreferrer"><span class="card-icon">{I["people"]}</span><h3>Not sure where to start?</h3><p>Tell us what is slowing you down and we will point you to the right first step, honestly, even if that is not us.</p><span class="link-arrow">Book a free call {I["arrow"]}</span></a>'
@@ -1123,9 +1305,8 @@ def home():
   <div class="hero-grid-overlay" aria-hidden="true"></div>
   <div class="hero-3d" aria-hidden="true"></div>
   <div class="container">
-    <span class="eyebrow eyebrow--center">Managed Cloud Services &amp; AI Consulting</span>
-    <h1>Your technology, <span class="text-gradient">fully managed.</span><br>Your AI, finally shipped.</h1>
-    <p class="lede measure">Orbit3 is your outsourced tech team. We provide managed cloud services that keep your cloud and IT operations secure, reliable and cost-efficient, and we build the custom AI and automation that give you an edge. One accountable partner.</p>
+    <h1><span class="eyebrow eyebrow--center" style="display:flex;flex-wrap:wrap">Managed cloud services &amp; AI consulting, Sydney</span>Your technology, <span class="text-gradient">fully managed.</span><br>Your AI, finally shipped.</h1>
+    <p class="lede measure">Orbit3 is your Sydney-based outsourced tech team. We provide managed cloud services that keep your cloud and IT operations secure, reliable and cost-efficient, and we build the custom AI and automation that give you an edge. One accountable partner.</p>
     <div class="hero-actions">
       <a class="btn btn-primary btn-lg" href="{CAL}" target="_blank" rel="noopener noreferrer">{I["cal"]} Book a free intro call</a>
       <a class="btn btn-ghost btn-lg" href="/Services/">See what we do {I["arrow"]}</a>
@@ -1204,14 +1385,14 @@ def home():
       <span class="eyebrow">Growing capability</span>
       <h2>AI Consulting &amp; Implementation</h2>
       <p>From custom LLM applications to workflow automation and AI agents, we take AI from idea to production, built on secure cloud foundations and managed for the long run, so the value compounds instead of fading after launch.</p>
-      {checklist([("Custom AI &amp; LLM applications", "RAG, copilots and assistants on your data."), ("Workflow automation &amp; agents", "Reliable automations that take real action.")])}
+      {checklist([("Custom AI &amp; LLM applications", "RAG, copilots and assistants on your data."), ("Workflow automation &amp; agents", "Reliable <a href='/Services/ai-automation/'>AI automation</a> that takes real action.")])}
       <div class="hero-actions"><a class="link-arrow" href="{SURL["ai-solutions"]}">Explore AI Solutions {I["arrow"]}</a></div>
     </div>
   </div>
 </section>
 <section class="section">
   <div class="container">
-    <div class="center measure" style="margin-bottom:44px"><span class="eyebrow eyebrow--center">Everything we do</span><h2>Eight services, one accountable team</h2><p>Start with the one that solves today's problem. Most clients add more once the day-to-day is under control.</p></div>
+    <div class="center measure" style="margin-bottom:44px"><span class="eyebrow eyebrow--center">Everything we do</span><h2>Ten services, one accountable team</h2><p>Start with the one that solves today's problem. Most clients add more once the day-to-day is under control.</p></div>
     <div class="grid grid-4 grid--services">{grid}</div>
   </div>
 </section>
@@ -1227,8 +1408,8 @@ def home():
 </section>
 {cta_band("Let's find your fastest win", "Book a free 30-minute intro call", "We'll look at where your tech operations are costing you time or money, and where AI could give you an edge, and tell you honestly what's worth doing first.", "Book your free intro call")}
 '''
-    write(path, head(path, "Managed Cloud Services & AI Consulting | Orbit3",
-                     "Orbit3 provides managed cloud services and AI consulting. We run your cloud operations on AWS, Azure and Google Cloud and build custom AI. Book a free call.",
+    write(path, head(path, "Managed Cloud Services & AI Consulting Sydney | Orbit3",
+                     "Sydney-based managed cloud services and AI consulting. We run your cloud operations on AWS, Azure and Google Cloud and build custom AI. Book a free call.",
                      [ORG, website]) + header(path) + body + footer())
 home()
 
@@ -1244,8 +1425,8 @@ def about():
   <div class="hero-grid-overlay" aria-hidden="true"></div>
   <div class="container">
     {crumb_html}
-    <h1 class="measure">A founder-led cloud and AI consultancy <span class="text-gradient">that stays accountable</span></h1>
-    <p class="lede measure">Orbit3 runs cloud and IT operations for growing businesses and builds the AI and automation on top of them. This page is about who we are and how we work.</p>
+    <h1 class="measure">A Sydney cloud and AI consultancy <span class="text-gradient">that stays accountable</span></h1>
+    <p class="lede measure">Orbit3 is a Sydney-based consultancy that runs cloud and IT operations for growing businesses across Australia and builds the AI and automation on top of them. This page is about who we are and how we work.</p>
   </div>
 </section>
 <section class="section">
@@ -1260,8 +1441,9 @@ def about():
     <div class="reveal">
       <div class="card card--primary">
         <span class="card-icon">{I["people"]}</span>
-        <h3>Led by Martin, founder</h3>
-        <p>Orbit3 is led by its founder, Martin, who works directly with every client: on the first call, in the scoping, and in the monthly reviews. That is a deliberate choice about how a consultancy should feel from the client's side.</p>
+        <h3>Led by Martin Ozekin, founder</h3>
+        <p>Orbit3 is led by its founder, Martin Ozekin, who works directly with every client: on the first call, in the scoping, and in the monthly reviews. That is a deliberate choice about how a consultancy should feel from the client's side.</p>
+        <p>Martin is a cloud architect with more than ten years across AWS, Azure and Google Cloud, and holds the AWS Certified Solutions Architect – Professional certification.</p>
         <!-- TODO (Martin): add surname, a short bio with years of experience, named certifications and a photo (images/martin.webp, with alt text). Also add your personal LinkedIn URL to the founder entity in the Organization schema in build.py / each page's JSON-LD. -->
         <a class="link-arrow" href="{CAL}" target="_blank" rel="noopener noreferrer">Book a call with Martin {I["arrow"]}</a>
       </div>
@@ -1305,8 +1487,8 @@ def about():
 </section>
 {cta_band("Get in touch", "Talk to the people who will do the work", "Book a free intro call or send a message. We reply within one business day.")}
 '''
-    write(path, head(path, "About Orbit3 | Founder-led Cloud & AI Consultancy",
-                     "Orbit3 is a founder-led managed cloud services and AI consultancy. Who we are, how we work, the platforms we run and what to expect from an engagement.",
+    write(path, head(path, "About Orbit3 | Sydney Cloud & AI Consultancy",
+                     "Orbit3 is a Sydney-based managed cloud services and AI consultancy. Who we are, how we work, the platforms we run and what to expect from an engagement.",
                      [ORG, about_ld, crumb_ld]) + header(path) + body + footer())
 about()
 
@@ -1323,7 +1505,7 @@ def contact():
   <div class="container">
     {crumb_html}
     <h1 class="measure">Let's talk</h1>
-    <p class="lede measure">The fastest way to get started is a free 30-minute intro call. Prefer to write? Use the form. We reply within one business day.</p>
+    <p class="lede measure">The fastest way to get started is a free 30-minute intro call. Prefer to write? Use the form. We're based in Sydney, work with clients across Australia and reply within one business day.</p>
   </div>
 </section>
 <section class="section" style="padding-top:8px">
@@ -1334,7 +1516,7 @@ def contact():
       <form class="form mt-1" action="https://formspree.io/martin@orbit3.io" method="POST" name="email-form">
         <div class="field"><label for="name">Name</label><input class="input" type="text" id="name" name="name" placeholder="Your name" autocomplete="name" required></div>
         <div class="field"><label for="email">Email</label><input class="input" type="email" id="email" name="email" placeholder="you@company.com" autocomplete="email" required></div>
-        <div class="field"><label for="Phone">Phone <span style="color:var(--fg-faint)">(optional)</span></label><input class="input" type="tel" id="Phone" name="Phone" placeholder="+44 ..." autocomplete="tel"></div>
+        <div class="field"><label for="Phone">Phone <span style="color:var(--fg-faint)">(optional)</span></label><input class="input" type="tel" id="Phone" name="Phone" placeholder="+61 ..." autocomplete="tel"></div>
         <div class="field"><label for="Message">How can we help?</label><textarea class="textarea" id="Message" name="Message" placeholder="A sentence or two about what you're trying to achieve." required></textarea></div>
         <button class="btn btn-primary btn-block btn-lg" type="submit">Send message</button>
       </form>
@@ -1361,7 +1543,7 @@ def contact():
   </div>
 </section>
 '''
-    write(path, head(path, "Contact Orbit3 | Book a Free Cloud & AI Intro Call",
+    write(path, head(path, "Contact Orbit3 | Free Cloud & AI Intro Call, Sydney",
                      "Book a free 30-minute intro call with Orbit3 or send a message. Managed cloud services and AI consulting. We reply within one business day.",
                      [ORG, cp, crumb_ld]) + header(path) + body + footer())
 contact()
@@ -1369,7 +1551,7 @@ contact()
 # =====================================================================================
 #  INSIGHTS (blog)
 # =====================================================================================
-AUTHOR = {"@type": "Person", "@id": f"{SITE}/about/#founder", "name": "Martin", "jobTitle": "Founder, Orbit3", "url": f"{SITE}/about/"}
+AUTHOR = {"@type": "Person", "@id": f"{SITE}/about/#founder", "name": "Martin Ozekin", "jobTitle": "Founder, Orbit3", "url": f"{SITE}/about/", "hasCredential": {"@type": "EducationalOccupationalCredential", "name": "AWS Certified Solutions Architect – Professional", "credentialCategory": "certification", "recognizedBy": {"@type": "Organization", "name": "Amazon Web Services"}}}
 
 SOC2_GUIDE_BODY = '''
 <p>You connected AWS, Google Workspace and GitHub to Vanta on Monday. By Tuesday the dashboard showed 60-odd failing tests, a policy library nobody has read, and a list of tasks assigned to people who did not know they were on the hook. Welcome to SOC 2 remediation: the part of the project that sits between "we bought the tool" and "we have the report", and the part where most SOC 2 timelines quietly slip.</p>
@@ -1697,8 +1879,8 @@ SANDBOX_BODY = '''
 SANDBOX_POST = {
   "slug": "sandboxing-ai-workloads",
   "title": "Sandboxing AI Workloads and Securing Agents Across the Engineering Pipeline",
-  "seo_title": "Sandboxing AI Workloads: Isolating AI Agents on GCP, AWS and Locally | Orbit3",
-  "desc": "A practical guide to sandboxing AI workloads: gVisor, microVMs and managed sandboxes on Google Cloud, AWS and your laptop, plus how to secure coding agents and CI/CD pipelines.",
+  "seo_title": "Sandboxing AI Agents on GCP, AWS and Locally | Orbit3",
+  "desc": "Sandboxing AI workloads in practice: gVisor, microVMs and managed sandboxes on Google Cloud, AWS and your laptop, plus securing coding agents and CI/CD.",
   "category": "AI Security",
   "date": "2026-09-03", "updated": "2026-09-03",
   "summary": "Containers aren't enough. The isolation ladder from WASM to microVMs, how to stand it up on Google Cloud, AWS and your own machine, and how to keep coding agents and CI/CD pipelines contained when they hold the keys to everything.",
@@ -1715,13 +1897,210 @@ SANDBOX_POST = {
   "cta": ("Get started", "Running agents that can execute code?", "Book a free 30-minute call. We'll look at where your agents run, what they can reach and what they hold, and tell you what to fix first.", "Book a free AI security call"),
 }
 
+SOC2_TYPES_BODY = '''
+<p>The first time a customer asks for "your SOC 2", the follow-up question is usually "which one?" There are two types of SOC 2 report, they answer different questions, and starting with the wrong one can add months to a sales cycle. This guide explains the difference in plain English: what each report contains, how long each takes, and the path most SaaS companies follow.</p>
+
+<h2 id="short-answer">The short answer</h2>
+<p>A <strong>SOC 2 Type 1</strong> report says your security controls were suitably designed and in place on a single date. A <strong>SOC 2 Type 2</strong> report says those controls were designed and also <em>operated effectively</em> over a period of time, usually between three and twelve months. Type 2 is the stronger report and the one most enterprise buyers ultimately want. Type 1 is faster, and is often used to unblock deals while the Type 2 observation period runs.</p>
+
+<h2 id="what-soc2-is">What SOC 2 is, briefly</h2>
+<p>SOC 2 is an attestation report issued by an independent CPA firm under standards set by the American Institute of Certified Public Accountants (AICPA). It reports on your controls against the <strong>Trust Services Criteria</strong>: Security, which is mandatory, plus Availability, Confidentiality, Processing Integrity and Privacy, which you add only if your customers need them. Type 1 and Type 2 use the same criteria. The difference is what the auditor tests.</p>
+
+<h2 id="type-1">SOC 2 Type 1: design at a point in time</h2>
+<p>For a Type 1, the auditor picks a date and examines whether your controls on that date are suitably designed to meet the criteria and have actually been implemented. They read your policies, inspect configurations, review your system description and typically test a single instance of each control.</p>
+<p>A Type 1 tells a customer you have thought about security properly and the controls exist. It does not tell them whether anyone follows those controls on an ordinary Tuesday six months later.</p>
+<ul>
+  <li><strong>Timeline:</strong> once remediation is done, audit fieldwork usually takes a few weeks, and the report follows shortly after.</li>
+  <li><strong>Best for:</strong> a first report to unblock a waiting deal, or a company that has only just put its controls in place.</li>
+</ul>
+
+<h2 id="type-2">SOC 2 Type 2: operating effectiveness over time</h2>
+<p>For a Type 2, the auditor examines a period, called the <strong>observation period</strong> or review period, and tests whether each control operated effectively throughout it. Instead of one example, they sample: a selection of new starters to confirm onboarding checks happened, a selection of leavers to confirm access was removed promptly, several quarterly access reviews, and a sample of production changes to confirm each was reviewed and approved.</p>
+<p>Observation periods commonly run from three to twelve months. A first Type 2 often covers three to six months; renewals usually cover twelve, so the reports run back to back and coverage is continuous.</p>
+<ul>
+  <li><strong>Timeline:</strong> the observation period, plus a few weeks of fieldwork and reporting after it ends.</li>
+  <li><strong>Best for:</strong> enterprise and US customers, regulated industries, and anyone whose procurement questionnaire has "SOC 2 Type II" written on it.</li>
+</ul>
+
+<h2 id="comparison">Type 1 vs Type 2 side by side</h2>
+<div class="table-wrap"><table>
+<thead><tr><th></th><th>SOC 2 Type 1</th><th>SOC 2 Type 2</th></tr></thead>
+<tbody>
+<tr><td>Question answered</td><td>Are the controls designed and in place?</td><td>Did the controls work, consistently, over time?</td></tr>
+<tr><td>Period covered</td><td>A single date</td><td>Usually 3 to 12 months</td></tr>
+<tr><td>Auditor testing</td><td>Design and implementation</td><td>Design, implementation and operating effectiveness, by sampling</td></tr>
+<tr><td>Time to report after remediation</td><td>Weeks</td><td>Observation period plus weeks</td></tr>
+<tr><td>Weight with enterprise buyers</td><td>Accepted as a first step</td><td>The report most buyers expect</td></tr>
+<tr><td>Renewal</td><td>Usually replaced by a Type 2</td><td>Annually</td></tr>
+</tbody>
+</table></div>
+
+<h2 id="which-first">Which should you get first?</h2>
+<p>Ask the customer who requested it. If the contract says Type 2 and nothing else will do, plan for the observation period now. In practice, many buyers will accept a Type 1 together with a committed date for the Type 2, which is why the most common path for a SaaS company is:</p>
+<ol>
+  <li><strong>Remediate</strong> to Type 2 standard from the start. The controls are the same for both reports; only the evidence period differs.</li>
+  <li><strong>Get a Type 1</strong> as soon as the controls are in place, to unblock the deals that are waiting.</li>
+  <li><strong>Start the Type 2 observation period</strong> straight after the Type 1 date, so there is no gap.</li>
+  <li><strong>Renew annually</strong> with a twelve-month observation period, so coverage is continuous.</li>
+</ol>
+<p>Going straight to Type 2 without a Type 1 is also common, especially when no deal is waiting. It saves one audit fee, at the cost of having nothing to show customers until the observation period ends.</p>
+
+<h2 id="what-fails">What makes a Type 2 go wrong</h2>
+<p>Type 1 audits rarely surprise anyone, because the auditor is looking at controls you have just put in place. Type 2 exceptions come from the controls that depend on people doing something regularly:</p>
+<ul>
+  <li><strong>Access reviews</strong> scheduled quarterly and done twice.</li>
+  <li><strong>Offboarding</strong> where a leaver kept access to one SaaS tool for three weeks.</li>
+  <li><strong>Change management</strong> where an urgent fix went to production without a review.</li>
+  <li><strong>Restore tests</strong> that were planned but never recorded.</li>
+  <li><strong>Vendor reviews and training</strong> that slipped when the person who owned them left.</li>
+</ul>
+<p>An exception is not a failed audit. It appears in the report alongside management's response, and customers read it. A handful of minor exceptions is normal; a pattern of them weakens the report. The fix is to make recurring controls automatic or clearly owned, and to monitor them, which is where compliance automation platforms such as Vanta earn their place. Our <a href="/insights/soc-2-remediation-guide/">SOC 2 remediation guide</a> covers how to get the controls green in the first place.</p>
+
+<h2 id="australia">Notes for Australian companies</h2>
+<p>SOC 2 is a US standard, but Australian SaaS and technology companies get it for the same reason as everyone else: their customers ask for it. A few practical points:</p>
+<ul>
+  <li><strong>Auditors.</strong> The report must be issued by an independent CPA firm. Some Australian firms offer SOC 2 through CPA-licensed partners, and US firms routinely audit Australian companies remotely.</li>
+  <li><strong>Other frameworks.</strong> Local enterprise and government customers may ask for ISO 27001 or the <a href="/Services/essential-eight/">Essential Eight</a> instead of, or as well as, SOC 2. Most controls overlap, so map them once.</li>
+  <li><strong>Privacy criteria.</strong> If you include the Privacy criteria, align them with your obligations under the Privacy Act 1988 and the Australian Privacy Principles.</li>
+</ul>
+
+<h2 id="orbit3">Where Orbit3 fits</h2>
+<p>We do the work between "we need SOC 2" and "here is the report": scoping, fixing the failing controls in Vanta, operating the recurring tasks through the observation period, and preparing the evidence your auditor will sample. See our <a href="/Services/soc2-compliance/">SOC 2 compliance service</a>, or <a href="/contact/">get in touch</a> and we will tell you which report to aim for first and how long it should realistically take.</p>
+'''
+
+SOC2_TYPES_POST = {
+  "slug": "soc-2-type-1-vs-type-2",
+  "title": "SOC 2 Type 1 vs Type 2: Which Report Do You Need?",
+  "seo_title": "SOC 2 Type 1 vs Type 2: Which Report Do You Need? | Orbit3",
+  "desc": "SOC 2 Type 1 vs Type 2 explained: what each report covers, how long each takes, which one customers expect, and the fastest path for an Australian SaaS company.",
+  "category": "Compliance",
+  "date": "2026-10-22", "updated": "2026-10-22",
+  "summary": "Type 1 checks your controls are designed properly on one day. Type 2 checks they actually worked over months. What each report contains, how long each takes, which one buyers want, and the path most SaaS companies take.",
+  "keywords": ["SOC 2 Type 1", "SOC 2 Type 2", "SOC 2 report", "SOC 2 Type II", "SOC 2 observation period", "SOC 2 Australia", "Vanta"],
+  "body": SOC2_TYPES_BODY,
+  "faqs": [
+   ("What is the difference between SOC 2 Type 1 and Type 2?", "Type 1 reports on whether your controls were suitably designed and in place on a single date. Type 2 reports on whether they operated effectively over a period, usually three to twelve months, which the auditor tests by sampling."),
+   ("How long is a SOC 2 Type 2 observation period?", "Commonly three to twelve months. First Type 2 reports often cover three to six months; renewals usually cover twelve so that coverage is continuous."),
+   ("Is a SOC 2 Type 1 worth getting?", "Often, if a deal is waiting. A Type 1 can be issued within weeks of finishing remediation, and many buyers accept it alongside a committed Type 2 date. If nothing is waiting, going straight to Type 2 saves an audit fee."),
+   ("Can you fail a SOC 2 Type 2 audit?", "Reports are not pass or fail in the usual sense. The auditor issues an opinion and lists any exceptions, where a control did not operate as described. A few minor exceptions are common; a pattern of them, or a qualified opinion, weakens the report in customers' eyes."),
+   ("Do Australian companies need SOC 2?", "Not by law. Australian companies get SOC 2 because customers, particularly US and enterprise buyers, ask for it. Depending on who you sell to, ISO 27001 or the Essential Eight may be requested instead or as well."),
+  ],
+  "related": ["soc2-compliance", "essential-eight", "cloud-security"],
+  "cta": ("Get started", "Not sure which SOC 2 report to aim for?", "Book a free 30-minute call. We'll look at what your customers are asking for and tell you the fastest credible path to a report.", "Book a free SOC 2 call"),
+}
+
+E8_LEVELS_BODY = '''
+<p>The Essential Eight comes up in government tenders, cyber insurance questionnaires and board meetings, usually phrased as "what is our maturity level?" This guide explains what the Essential Eight is, what each maturity level means, which level your organisation is likely to need, and how to get there in a sensible order.</p>
+<p>The Australian Signals Directorate (ASD) publishes the Essential Eight and its maturity model on <a href="https://www.cyber.gov.au/" target="_blank" rel="noopener">cyber.gov.au</a>, and that is the authoritative source for the detailed requirements. The model was last substantially updated in November 2023. This article is a practical overview, not a substitute for it.</p>
+
+<h2 id="what-it-is">What the Essential Eight is</h2>
+<p>The Essential Eight is a set of eight mitigation strategies that ASD considers the most effective baseline for protecting internet-connected networks against common cyber threats. They fall into three groups:</p>
+<ul>
+  <li><strong>Stopping malware from being delivered and run:</strong> application control, patch applications, restrict Microsoft Office macros, and user application hardening.</li>
+  <li><strong>Limiting the damage when something gets in:</strong> restrict administrative privileges, patch operating systems, and multi-factor authentication.</li>
+  <li><strong>Recovering data and systems:</strong> regular backups.</li>
+</ul>
+<p>ASD designed the Essential Eight for Microsoft Windows-based networks connected to the internet. It can be applied to other environments, such as cloud services and Linux servers, but there it is a guide to the protections you need rather than a literal checklist.</p>
+
+<h2 id="the-eight">The eight strategies in plain English</h2>
+<div class="table-wrap"><table>
+<thead><tr><th>Strategy</th><th>What it means in practice</th></tr></thead>
+<tbody>
+<tr><td>Patch applications</td><td>Browsers, office suites, PDF software, email clients, security products and internet-facing services updated quickly, with scanning to find what is missing. Unsupported software removed.</td></tr>
+<tr><td>Patch operating systems</td><td>Workstations, servers and network devices updated on a schedule, fastest for internet-facing systems and vulnerabilities with known exploits. Unsupported operating systems replaced.</td></tr>
+<tr><td>Multi-factor authentication</td><td>MFA for online services, remote access and privileged users, moving to phishing-resistant methods at higher levels.</td></tr>
+<tr><td>Restrict administrative privileges</td><td>Admin rights only for the people and tasks that need them, separate privileged accounts, and no web browsing or email from those accounts.</td></tr>
+<tr><td>Application control</td><td>Only approved programs, scripts and installers can run on workstations, extending to servers at higher levels.</td></tr>
+<tr><td>Restrict Microsoft Office macros</td><td>Macros blocked for users without a business need, and macros from the internet blocked for everyone.</td></tr>
+<tr><td>User application hardening</td><td>Browsers and office applications configured to block risky content, such as web advertisements and Java from the internet, with Internet Explorer 11 disabled or removed.</td></tr>
+<tr><td>Regular backups</td><td>Important data, software and settings backed up in line with business criticality, protected from change or deletion, and tested by restoring them.</td></tr>
+</tbody>
+</table></div>
+
+<h2 id="levels">The maturity levels</h2>
+<p>The maturity model defines four levels. Each is built around the kind of adversary it is designed to stop.</p>
+<ul>
+  <li><strong>Maturity Level Zero:</strong> weaknesses in your overall posture. Any strategy that falls short of Level One sits here.</li>
+  <li><strong>Maturity Level One:</strong> aimed at adversaries using widely available tools who look for any victim with a common weakness, such as an unpatched internet-facing service or an account without MFA.</li>
+  <li><strong>Maturity Level Two:</strong> aimed at adversaries who will invest more time and use more effective tools, and who choose targets more deliberately, for example with phishing aimed at your staff.</li>
+  <li><strong>Maturity Level Three:</strong> aimed at adaptive adversaries who rely less on public tools, exploit weaknesses quickly and work to get around your controls, for instance by going after privileged credentials.</li>
+</ul>
+<p>Each level adds requirements to every strategy. As a rough guide to how the bar rises: patching timeframes and scanning coverage tighten, MFA has to become phishing-resistant, application control extends from workstations to servers, privileged access becomes time-limited and more closely watched, and event logs have to be collected centrally, protected and actually reviewed.</p>
+
+<h2 id="patching-example">One strategy across the levels: patching</h2>
+<p>Patching shows how the levels work in practice. Under the November 2023 model, Maturity Level One expects, among other things:</p>
+<ul>
+  <li>Patches for vulnerabilities in internet-facing services applied within two weeks of release, or within 48 hours when a working exploit exists.</li>
+  <li>Patches for office productivity suites, web browsers, email clients, PDF software and security products applied within two weeks.</li>
+  <li>Operating system patches for workstations and non-internet-facing servers applied within one month.</li>
+  <li>Automated asset discovery and a vulnerability scanner used to find what is missing, and unsupported software removed.</li>
+</ul>
+<p>Levels Two and Three extend the same discipline to more software, scan more often and, at Level Three, bring drivers and firmware into scope. The exact requirements for each level are in ASD's maturity model.</p>
+
+<h2 id="which-level">Which level do you need?</h2>
+<ul>
+  <li><strong>Non-corporate Commonwealth entities</strong> must implement the Essential Eight to Maturity Level Two under the Protective Security Policy Framework. ASD's <a href="https://www.cyber.gov.au/about-us/view-all-content/reports-and-statistics/the-commonwealth-cyber-security-posture-in-2025" target="_blank" rel="noopener">Commonwealth cyber security posture report for 2025</a> found that 22% of entities had reached Level Two across all eight strategies, which shows how demanding it is.</li>
+  <li><strong>Suppliers to government</strong> are increasingly asked to state their maturity, and Level Two is a common expectation where sensitive information is involved.</li>
+  <li><strong>Most private businesses</strong> should aim for Level One across all eight strategies first. It blocks the opportunistic attacks behind most incidents and is achievable for a small team.</li>
+  <li><strong>Organisations holding sensitive data or facing targeted threats</strong> should plan for Level Two, and consider Level Three only where the threat genuinely warrants it.</li>
+</ul>
+<p>ASD's guidance is to reach the same maturity level across all eight strategies before moving to a higher one. An organisation at Level Three on backups and Level Zero on MFA is still exposed through MFA, so spreading the effort evenly matters more than excelling at one strategy.</p>
+
+<h2 id="assessment">How an Essential Eight assessment works</h2>
+<p>An assessment tests whether each requirement is actually met on your systems, not whether a policy says it should be. ASD publishes an assessment process guide that sets out how assessors collect evidence, from configuration exports and system queries to checking that a blocked application really is blocked. A good assessment gives you:</p>
+<ol>
+  <li>An assessed maturity level for each of the eight strategies.</li>
+  <li>The specific requirements not yet met, with the evidence behind each finding.</li>
+  <li>A prioritised plan to bring every strategy up to your target level.</li>
+</ol>
+<p>There is no Essential Eight certificate. The assessment report, and the evidence behind it, is what customers, insurers and boards ask to see.</p>
+
+<h2 id="order">Where to start</h2>
+<p>For most organisations moving from Level Zero to Level One, a sensible order is:</p>
+<ol>
+  <li><strong>MFA everywhere it is missing</strong>, starting with email, remote access and admin accounts.</li>
+  <li><strong>Patching</strong> automated for operating systems and common applications, with a scanner to prove it.</li>
+  <li><strong>Backups</strong> checked, protected from deletion and tested with a real restore.</li>
+  <li><strong>Admin rights</strong> removed from everyday accounts.</li>
+  <li><strong>Office macros and browser hardening</strong> set through central policy.</li>
+  <li><strong>Application control</strong> last, because it needs the most testing to avoid disrupting staff.</li>
+</ol>
+<p>In a Microsoft 365 environment, most of this is done with tools you already license: Intune, Defender, Entra ID and Group Policy. The work is in the configuration, the testing and keeping it current, not in buying new products.</p>
+
+<h2 id="orbit3">Where Orbit3 fits</h2>
+<p>We run <a href="/Services/essential-eight/">Essential Eight assessments and uplift</a> for Australian organisations: an evidenced maturity level per strategy, a roadmap in priority order, and the controls implemented with your team. Because we also provide <a href="/Services/cloudops-managed-services/">managed IT and cloud operations</a>, we can keep the controls working once you reach your target. <a href="/contact/">Get in touch</a> for a free 30-minute call.</p>
+'''
+
+E8_LEVELS_POST = {
+  "slug": "essential-eight-maturity-levels",
+  "title": "Essential Eight Maturity Levels Explained: What One, Two and Three Mean",
+  "seo_title": "Essential Eight Maturity Levels Explained | Orbit3",
+  "desc": "The Essential Eight maturity levels explained: the eight strategies, what Maturity Levels One, Two and Three require, who needs which, and how assessments work.",
+  "category": "Security",
+  "date": "2026-10-22", "updated": "2026-10-22",
+  "summary": "ASD's Essential Eight in plain English: the eight mitigation strategies, what changes between Maturity Levels Zero and Three, which level your organisation needs, and the order to tackle it in.",
+  "keywords": ["Essential Eight", "Essential Eight maturity model", "Essential Eight maturity levels", "Essential 8 assessment", "ASD", "Maturity Level Two", "PSPF"],
+  "body": E8_LEVELS_BODY,
+  "faqs": [
+   ("What are the Essential Eight maturity levels?", "The maturity model has four levels. Level Zero means a strategy is not yet implemented to Level One. Levels One, Two and Three each target a more capable adversary, from opportunistic attackers using common tools at Level One to adaptive adversaries at Level Three, and each adds requirements to every strategy."),
+   ("What maturity level should my business aim for?", "Most private businesses should reach Maturity Level One across all eight strategies first. Non-corporate Commonwealth entities must reach Level Two, and suppliers handling sensitive government information are often asked for the same."),
+   ("Is the Essential Eight mandatory?", "It is mandatory for non-corporate Commonwealth entities under the Protective Security Policy Framework. For other organisations it is voluntary, but it is increasingly expected by government contracts, enterprise customers and cyber insurers."),
+   ("Can you be Essential Eight certified?", "No. There is no formal certification scheme. Organisations are assessed against ASD's maturity model, and the resulting report states the maturity level reached for each strategy."),
+   ("How often should we reassess?", "At least annually, and after major changes to your environment. ASD updates the maturity model from time to time, so check that your last assessment used the current version."),
+  ],
+  "related": ["essential-eight", "cloud-security", "cloudops-managed-services"],
+  "cta": ("Get started", "Want to know your Essential Eight maturity?", "Book a free 30-minute call. We'll give you an honest view of where you're likely to sit and what an assessment would involve.", "Book a free Essential Eight call"),
+}
+
 POSTS = [
+ SOC2_TYPES_POST,
+ E8_LEVELS_POST,
  SANDBOX_POST,
  {
   "slug": "soc-2-remediation-guide",
   "title": "SOC 2 Remediation: How to Close the Gaps Vanta Finds",
   "seo_title": "SOC 2 Remediation Guide: Fixing the Gaps Vanta Finds | Orbit3",
-  "desc": "A practical SOC 2 remediation guide: why Vanta shows failing tests on day one, the eight gaps to fix first, a 90-day plan, and the mistakes that stall the audit.",
+  "desc": "A practical SOC 2 remediation guide: why Vanta shows failing tests on day one, the eight gaps to fix first, a 90-day plan, and mistakes that stall audits.",
   "category": "Compliance",
   "date": "2026-09-02", "updated": "2026-09-02",
   "summary": "Why the first Vanta scan is red, which failing tests to fix first, how to sequence remediation into a 90-day plan, and the five mistakes that turn a six-week project into a six-month one.",
@@ -1753,7 +2132,7 @@ def post_page(post):
                "mainEntityOfPage": {"@type": "WebPage", "@id": url}, "datePublished": post["date"], "dateModified": post["updated"],
                "author": AUTHOR, "publisher": {"@id": f"{SITE}/#organization"},
                "image": f"{SITE}/images/og-image.png", "articleSection": post["category"], "keywords": ", ".join(post["keywords"]),
-               "wordCount": words, "inLanguage": "en-GB", "isPartOf": {"@id": f"{SITE}/insights/#blog"}}
+               "wordCount": words, "inLanguage": "en-AU", "isPartOf": {"@id": f"{SITE}/insights/#blog"}}
     toc = "".join(f'<li><a href="#{m.group(1)}">{m.group(2)}</a></li>' for m in re.finditer(r'<h2 id="([^"]+)">(.*?)</h2>', post["body"]))
     nice_date = __import__("datetime").date.fromisoformat(post["date"]).strftime("%-d %B %Y")
     rel_cards = "".join(f'<a class="card card--link reveal" href="{SURL[s]}"><h3>{SNAME[s]}</h3><p>{BLURB[s]}</p><span class="link-arrow">Learn more {I["arrow"]}</span></a>' for s in post["related"])
@@ -1765,7 +2144,7 @@ def post_page(post):
     <span class="eyebrow eyebrow--center">{post["category"]}</span>
     <h1 class="measure" style="font-size:clamp(2rem,4.4vw,3.3rem)">{post["title"]}</h1>
     <p class="lede measure">{post["summary"]}</p>
-    <div class="post-meta"><span>By <a href="/about/">Martin, Founder</a></span><span class="sep" aria-hidden="true">·</span><span>Published <time datetime="{post["date"]}">{nice_date}</time></span><span class="sep" aria-hidden="true">·</span><span>{mins} min read</span></div>
+    <div class="post-meta"><span>By <a href="/about/">Martin Ozekin, Founder</a></span><span class="sep" aria-hidden="true">·</span><span>Published <time datetime="{post["date"]}">{nice_date}</time></span><span class="sep" aria-hidden="true">·</span><span>{mins} min read</span></div>
   </div>
 </section>
 <article class="section" style="padding-top:16px">
@@ -1774,7 +2153,7 @@ def post_page(post):
     <div class="prose">{post["body"]}</div>
     <div class="card card--primary author-card mt-2">
       <span class="card-icon">{I["people"]}</span>
-      <div><h3 style="font-size:1.1rem">About the author</h3><p>Martin is the founder of Orbit3, a managed cloud services and AI consultancy. He works directly with every client on cloud operations, security and compliance. <a href="/about/" style="color:var(--accent)">More about Orbit3</a>.</p></div>
+      <div><h3 style="font-size:1.1rem">About the author</h3><p>Martin Ozekin is the founder of Orbit3, a Sydney-based managed cloud services and AI consultancy, and an AWS Certified Solutions Architect – Professional. He works directly with every client on cloud operations, security and compliance. <a href="/about/" style="color:var(--accent)">More about Orbit3</a>.</p></div>
     </div>
   </div>
 </article>
@@ -1879,6 +2258,8 @@ def not_found():
      "/blog/blog.html": "/",
      "/index.html": "/",
     }
+    for _s, _n in SERVICES:
+        legacy[f"/services/{_s}"] = SURL[_s]
     body = f'''<section class="page-hero center">
   <div class="aurora" aria-hidden="true"><span class="blob"></span></div>
   <div class="hero-grid-overlay" aria-hidden="true"></div>
@@ -1922,12 +2303,27 @@ stub("/about-us.html", "/about/", "About")
 # =====================================================================================
 #  sitemap.xml and robots.txt
 # =====================================================================================
+import subprocess, datetime
+def lastmod(u):
+    """Last-modified date for a sitemap URL: today if the generated file differs from git HEAD
+    (or is new), otherwise the date of the last commit that touched it."""
+    fs = u.lstrip("/") + ("index.html" if u.endswith("/") else "")
+    try:
+        dirty = subprocess.run(["git", "--no-optional-locks", "status", "--porcelain", "--", fs], capture_output=True, text=True).stdout.strip()
+        if not dirty:
+            d = subprocess.run(["git", "--no-optional-locks", "log", "-1", "--format=%cs", "--", fs], capture_output=True, text=True).stdout.strip()
+            if d:
+                return d
+    except Exception:
+        pass
+    return datetime.date.today().isoformat()
+
 urls = [("/", "1.0"), ("/Services/", "0.9"), (SURL["cloudops-managed-services"], "0.9"), (SURL["ai-solutions"], "0.9"),
-        (SURL["cloud-adoption"], "0.7"), (SURL["cloud-security"], "0.7"), (SURL["soc2-compliance"], "0.8"), (SURL["cloud-optimisation"], "0.7"), (SURL["cloud-devops"], "0.7"), (SURL["cloud-backup"], "0.7"),
+        (SURL["cloud-adoption"], "0.7"), (SURL["cloud-security"], "0.7"), (SURL["soc2-compliance"], "0.8"), (SURL["essential-eight"], "0.8"), (SURL["ai-automation"], "0.8"), (SURL["cloud-optimisation"], "0.7"), (SURL["cloud-devops"], "0.7"), (SURL["cloud-backup"], "0.7"),
         ("/about/", "0.6"), ("/contact/", "0.6"), ("/insights/", "0.6")] + [(f"/insights/{pp['slug']}/", "0.7") for pp in POSTS]
 sm = '<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n'
 for u, p in urls:
-    sm += f"  <url><loc>{SITE}{u}</loc><lastmod>{TODAY}</lastmod><changefreq>monthly</changefreq><priority>{p}</priority></url>\n"
+    sm += f"  <url><loc>{SITE}{u}</loc><lastmod>{lastmod(u)}</lastmod><changefreq>monthly</changefreq><priority>{p}</priority></url>\n"
 sm += "</urlset>\n"
 open("sitemap.xml", "w").write(sm); print("wrote sitemap.xml")
 open("robots.txt", "w").write(f"User-agent: *\nAllow: /\nDisallow: /404.html\n\nSitemap: {SITE}/sitemap.xml\n"); print("wrote robots.txt")
